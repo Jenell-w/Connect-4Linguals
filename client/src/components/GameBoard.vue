@@ -1,6 +1,17 @@
 <template>
   <div class="hello">
     <h1>{{ title }}</h1>
+    <div class="enter-topics-container">
+      <h3>Enter a topic</h3>
+      <input v-model="userTopic" type="text" name="user-topic" id="user-topic" />
+      <br />
+      <br />
+      <input type="submit" value="Play Game!" />
+      <h3>OR</h3>
+      <button v-on:click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
+      <h2 v-if="userTopic">{{ userTopic }}</h2>
+      <div v-else>{{ RandomTopic }}</div>
+    </div>
     <div class="game-board">
       <div class="grid-item">
         <!-- create "@keyupenter"- word is submitted -->
@@ -85,16 +96,34 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "GameBoard",
   props: {
     title: String
+  },
+  data() {
+    return {
+      userTopic: "",
+      RandomTopic: ""
+    };
+  },
+  methods: {
+    getRandomTopic() {
+      axios
+        .post("https://conn-linguals-ConnectLinguals.harperdbcloud.com")
+        .then(response => (this.RandomTopic = response));
+    }
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+h1 {
+  text-align: center;
+}
 .game-board {
   display: grid;
   grid-gap: 2rem;

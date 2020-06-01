@@ -4,6 +4,7 @@
 `cd client`
 `npm install`
 `npm run build`
+`npm install vue-router`
 
 -In a new tab:
 
