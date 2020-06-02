@@ -10,4 +10,5 @@
 
 `cd server`
 `pipenv install`
+`pipenv install requests`
 `pipenv run python app.py`

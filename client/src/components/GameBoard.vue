@@ -8,7 +8,7 @@
       <br />
       <input type="submit" value="Play Game!" />
       <h3>OR</h3>
-      <button v-on:click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
+      <button @click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
       <h2 v-if="userTopic">{{ userTopic }}</h2>
       <div v-else>{{ RandomTopic }}</div>
     </div>
@@ -112,10 +112,17 @@ export default {
   methods: {
     getRandomTopic() {
       axios
-        .post("https://conn-linguals-ConnectLinguals.harperdbcloud.com")
-        .then(response => (this.RandomTopic = response));
+        .post("/gettopics", { RandomTopic: this.RandomTopic })
+        .then(resp => {
+          // create array of topics, now I must randomly select one of them
+          console.log(resp);
+        })
+        .catch(error => console.log("error", error));
     }
   }
+  // mounted() {
+  //   this.getRandomTopic();
+  // }
 };
 </script>
 
