@@ -2,12 +2,14 @@ from flask import Flask, render_template, jsonify
 import requests
 from topicsAPI import topics_api
 from harperdb_instance import response
+from authAPI import auth_api
 
 app = Flask(__name__,
             static_folder="./dist/static",
             template_folder="./dist"
             )
 app.register_blueprint(topics_api)
+app.register_blueprint(auth_api)
 
 
 @app.route("/")
