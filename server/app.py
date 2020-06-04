@@ -8,6 +8,7 @@ app = Flask(__name__,
             static_folder="./dist/static",
             template_folder="./dist"
             )
+app.secret_key = "@H238sd&ew9@#lso@Apso"
 app.register_blueprint(topics_api)
 app.register_blueprint(auth_api)
 
