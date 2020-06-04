@@ -2,3 +2,6 @@ client/node_modules
 server/dist
 .DS_Store
 *.csv
+server/.env
+db
+server/.vscode

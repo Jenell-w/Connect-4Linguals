@@ -1,7 +1,6 @@
 from flask import Flask, render_template, jsonify
 import requests
 from topicsAPI import topics_api
-from harperdb_instance import response
 
 app = Flask(__name__,
             static_folder="./dist/static",
