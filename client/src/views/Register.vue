@@ -1,6 +1,5 @@
 <template>
   <div>
-    <navBar/>
     <h1>Register</h1>
     <!-- Pete, work your magic! Can you make login boxes disappear after user is logged in? -->
     <form>
@@ -18,13 +17,9 @@
 </template>
 
 <script>
-import navBar from "../components/navBar"
 
 export default {
   name: "App",
-    components: {
-    navBar
-  }
 };
 </script>
 

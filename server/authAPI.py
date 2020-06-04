@@ -21,7 +21,7 @@ def find_if_user_name_exists(username):
     return "False"
   return "True"
 
-@auth_api.route('/login', methods=['GET', 'POST'])
+@auth_api.route('/userlogin', methods=['GET', 'POST'])
 def login():
   session['user'] = ''
   password = request.json["password"].encode('UTF-8')
@@ -43,7 +43,7 @@ def login():
     return jsonify(success=False)
 
 
-@auth_api.route('/register', methods=['GET', 'POST'])
+@auth_api.route('/userregister', methods=['GET', 'POST'])
 def register():
   session['user'] = ''
   username = request.json["username"]

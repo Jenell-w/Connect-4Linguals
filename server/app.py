@@ -12,14 +12,12 @@ app.secret_key = "@H238sd&ew9@#lso@Apso"
 app.register_blueprint(topics_api)
 app.register_blueprint(auth_api)
 
+@app.route('/', defaults={'path': ''})
 
-@app.route("/")
-def serve_vue_app():
-    """
-    serve our Vue app
-    """
-    return(render_template('index.html'))
-
+@app.route('/<path:path>')
+def catch_all(path):
+        return render_template("index.html")
+    
 
 @app.after_request
 def add_header(req):
