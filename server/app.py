@@ -1,7 +1,6 @@
 from flask import Flask, render_template, jsonify
 import requests
 from topicsAPI import topics_api
-from harperdb_instance import response
 from authAPI import auth_api
 
 app = Flask(__name__,
@@ -12,14 +11,15 @@ app.secret_key = "@H238sd&ew9@#lso@Apso"
 app.register_blueprint(topics_api)
 app.register_blueprint(auth_api)
 
-#this is for going directly to home
-@app.route('/', defaults={'path': ''})
+# this is for going directly to home
 
-#This is for going directly to a route
+
+@app.route('/', defaults={'path': ''})
+@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-        return render_template("index.html")
-    
+    return(render_template('index.html'))
+
 
 @app.after_request
 def add_header(req):
