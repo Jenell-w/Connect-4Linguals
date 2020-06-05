@@ -13,6 +13,8 @@
 
 <script>
 import axios from "axios";
+import {globalSessionVar} from '../main'
+
 export default {
     name: "register",
     data() {
@@ -40,8 +42,9 @@ export default {
             } else {
                 this.username = '';
                 this.password = '';
+                globalSessionVar.$emit('login');
                 /* this setTimeout() allows for the session to be set and then will redirect*/
-                setTimeout(() => this.$router.push({ path: '/'}), 500);
+                setTimeout(() => this.$router.push({ path: '/'}), 1000);
             }
         console.log(response);
         })
