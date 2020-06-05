@@ -9,19 +9,14 @@ app = Flask(__name__,
 app.register_blueprint(topics_api)
 
 
-@app.route("/")
-def serve_vue_app():
-    """
-    serve our Vue app
-    """
+@app.route('/', defaults={'path': ''})
+@app.route("/<path:path>")
+def catch_all(path):
     return(render_template('index.html'))
 
 
 @app.after_request
 def add_header(req):
-    """
-    Clear cache for hot-reloading
-    """
     req.headers["Cache-Control"] = "no-cache"
     return req
 
