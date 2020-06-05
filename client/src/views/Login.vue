@@ -36,7 +36,7 @@ export default {
       this.username = '';
       this.password = '';
       /* this setTimeout() allows for the session to be set and then will redirect*/
-      setTimeout(() => this.$router.push({ path: '/'}), 300);
+      setTimeout(() => this.$router.push({ path: '/'}), 1000);
     }
   }
 }

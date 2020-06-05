@@ -6,11 +6,21 @@
 
 <script>
 import GameBoard from "../components/GameBoard";
+import { isAuthenticated } from './helpers';
 
 export default {
   name: "App",
   components: {
     GameBoard
+  },
+  mounted() {
+    isAuthenticated().then(data => {
+      if (data['session'] === false) {
+        this.$router.push('/login')
+      } else {
+        this.userSessionID = data['user']
+      }
+    })
   }
 };
 </script>

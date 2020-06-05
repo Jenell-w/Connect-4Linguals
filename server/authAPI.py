@@ -48,7 +48,7 @@ def register():
   session['user'] = ''
   username = request.json["username"]
   if find_if_user_name_exists(username) == "True":
-    return "Name Already Exists"
+    return jsonify(success=False)
   password = request.json["password"].encode('UTF-8')
   hashed = bcrypt.hashpw(password, bcrypt.gensalt())
   decoded_hashed = hashed.decode('utf8')
@@ -78,3 +78,8 @@ def check_session():
                 )
         else:
                 return jsonify(session = False)
+
+@auth_api.route("/logout", methods=["GET"])
+def logout():
+        del session['user']
+        return jsonify(success=True)
