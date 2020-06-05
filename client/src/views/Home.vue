@@ -1,19 +1,26 @@
 <template>
   <div id="app">
-    <navBar />
     <GameBoard title="Play Connect 4 Linguals" />
   </div>
 </template>
 
 <script>
 import GameBoard from "../components/GameBoard";
-import navBar from "../components/navBar";
+import { isAuthenticated } from './helpers';
 
 export default {
   name: "App",
   components: {
-    GameBoard,
-    navBar
+    GameBoard
+  },
+  mounted() {
+    isAuthenticated().then(data => {
+      if (data['session'] === false) {
+        this.$router.push('/login')
+      } else {
+        this.userSessionID = data['user']
+      }
+    })
   }
 };
 </script>

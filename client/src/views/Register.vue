@@ -1,31 +1,63 @@
 <template>
-  <div>
-    <navBar/>
-    <h1>Register</h1>
-    <!-- Pete, work your magic! Can you make login boxes disappear after user is logged in? -->
-    <form>
-      <label for="username">Enter your username:</label>
-      <input type="user" id="user" />
-      <br />
-      <br />
-      <label for="pswd">Enter your password:</label>
-      <input type="password" id="pswd" />
-      <br />
-      <br />
-      <input type="button" value="Submit" />
-    </form>
+<div class=register-box>
+  <div class="register-form">
+    <p class='error' v-if='error'>{{error}}</p>
+    <input @keyup.enter.exact='addUser' type="text" v-model="username" placeholder="Username"/>
+    <input @keyup.enter.exact='addUser' type="password" v-model="password" placeholder="Password"/>
+    <input @keyup.enter.exact='addUser' type="password" v-model="retypePassword" placeholder="Retype Password"/>
+    <button @click="addUser">Register</button>
+    <div class='sign-up-btn'>Already have an account?<a href="/login"> Login</a></div>
   </div>
+</div>
 </template>
 
 <script>
-import navBar from "../components/navBar"
+import axios from "axios";
+import {globalSessionVar} from '../main'
 
 export default {
-  name: "App",
-    components: {
-    navBar
-  }
-};
+    name: "register",
+    data() {
+    return {
+      username: '',
+      password: '',
+      retypePassword:'',
+      error: '',
+      code: '',
+    }
+  },
+  methods: {
+    /* add a new user, note there is no 
+    client side validation in place yet...*/ 
+    addUser() {
+      if (this.password == this.retypePassword) {
+        axios.post('userregister', {
+        username: this.username, 
+        password: this.password,
+        })
+        .then(response => {
+            if (response.data.success == false) {
+                this.$router.push({ path: '/register'})
+                this.error = 'Username already exists'
+            } else {
+                this.username = '';
+                this.password = '';
+                globalSessionVar.$emit('login');
+                /* this setTimeout() allows for the session to be set and then will redirect*/
+                setTimeout(() => this.$router.push({ path: '/'}), 1000);
+            }
+        console.log(response);
+        })
+        .catch(error => {
+        console.log(error);
+      });
+      } else {
+        this.error = 'Passwords do not match'
+      }
+    }
+  },
+}
 </script>
+
 
 <style></style>

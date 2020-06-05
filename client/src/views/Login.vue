@@ -1,31 +1,45 @@
 <template>
-  <div id="app">
-    <navBar/>
-    <h1>Login</h1>
-    <!-- Pete, work your magic! Can you make login boxes disappear after user is logged in? -->
-    <form>
-      <label for="username">Enter your username:</label>
-      <input type="user" id="user" />
-      <br />
-      <br />
-      <label for="pswd">Enter your password:</label>
-      <input type="password" id="pswd" />
-      <br />
-      <br />
-      <input type="button" value="Submit" />
-    </form>
-  </div>
+    <div class='login-box'>
+        <div class="login-form">
+            <input @keyup.enter.exact='checkUser' type="text" v-model="username" placeholder="Username"/>
+            <input @keyup.enter.exact='checkUser' type="password" v-model="password" placeholder="Password"/>
+            <button @click="checkUser" >Login</button>
+            <div class ='sign-up-btn'>Don't have an account?<a href="/register"> Sign Up</a></div>
+        </div>
+    </div>
 </template>
 
 <script>
-import navBar from "../components/navBar"
+import axios from "axios";
+import {globalSessionVar} from '../main'
 
 export default {
-  name: "App",
-  components: {
-    navBar
+    name: "login",
+    data() {
+    return {
+      username: '',
+      password: '',
+    }
+  },
+  methods: {
+    /* authenticates the user in the db */
+    checkUser() {
+      axios.post('userlogin', {
+        username: this.username, 
+        password: this.password
+        })
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+      });
+      this.username = '';
+      this.password = '';
+      globalSessionVar.$emit('login');
+      /* this setTimeout() allows for the session to be set and then will redirect*/
+      setTimeout(() => this.$router.push({ path: '/'}), 1000);
+    }
   }
-};
+}
 </script>
-
-<style></style>
