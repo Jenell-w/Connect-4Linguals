@@ -11,4 +11,6 @@
 `cd server`
 `pipenv install`
 `pipenv install requests`
+`pipenv install bcrypt`
+`pipenv install flask-socketio`
 `pipenv run python app.py`

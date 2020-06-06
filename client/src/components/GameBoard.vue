@@ -12,9 +12,10 @@
       />
       <br />
       <br />
-      <input type="submit" value="Play Game!" />
       <h3>OR</h3>
-      <button @click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
+      <button @click="getRandomTopic" class="rando-button" type="button">
+        Get a Random Topic
+      </button>
       <h2 v-if="userTopic">{{ userTopic }}</h2>
       <h2 v-else>
         <div>{{ RandomTopic }}</div>
@@ -23,7 +24,13 @@
     <div class="game-board">
       <div class="grid-item">
         <!-- create "@keyupenter"- word is submitted -->
-        <input v-model="item1" id="item-1" type="text" placeholder="Enter word" />
+        <input
+          @keyup.enter="gameplayEntry"
+          v-model="item1"
+          id="item-1"
+          type="text"
+          placeholder="Enter word"
+        />
         <p>{{ item1 }}</p>
         <br />
       </div>
@@ -100,6 +107,7 @@
         <input id="item-25" type="text" placeholder="Enter word" />
       </div>
     </div>
+    <!-- make the conversation boxes for player 'disputes' -->
   </div>
 </template>
 
@@ -109,12 +117,13 @@ import axios from "axios";
 export default {
   name: "GameBoard",
   props: {
-    title: String
+    title: String,
   },
   data() {
     return {
       userTopic: "",
       RandomTopic: "",
+      playedWord: "",
       item1: "",
       item2: "",
       item3: "",
@@ -139,16 +148,14 @@ export default {
       item22: "",
       item23: "",
       item24: "",
-      item25: ""
+      item25: "",
     };
   },
   methods: {
     getRandomTopic() {
       axios
         .post("/gettopics", { RandomTopic: this.RandomTopic })
-        .then(resp => {
-          // create array of topics, now I must randomly select one of them
-          // resp.data is an Object
+        .then((resp) => {
           let topicList = resp.data;
           let result = [];
           for (let i = 0; i < topicList.length; i++) {
@@ -157,13 +164,16 @@ export default {
           let randTopicSelection = Math.floor(Math.random() * result.length);
           this.RandomTopic = result[randTopicSelection];
         })
-        .catch(error => console.log("error", error));
+        .catch((error) => console.log("error", error));
     },
     //adds the user-entered topic to the db
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
-    }
-  }
+    },
+    gameplayEntry() {
+      axios.post("/enterword", { playedword: this.playedWord });
+    },
+  },
   // mounted() {
   //   this.getRandomTopic();
   // }
