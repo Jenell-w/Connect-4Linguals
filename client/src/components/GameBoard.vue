@@ -20,22 +20,30 @@
       <h2 v-else>
         <div>{{ RandomTopic }}</div>
       </h2>
+      <button class="play-now-topic" @click="playNow">Play Now!</button>
     </div>
     <div class="game-board">
       <div class="grid-item">
-        <!-- create "@keyupenter"- word is submitted -->
         <input
-          @keyup.enter="gameplayEntry"
-          v-model="item1"
+          @keyup.enter="gameplayEntry()"
+          v-model="item1Word"
           id="item-1"
           type="text"
           placeholder="Enter word"
         />
-        <p>{{ item1 }}</p>
+        <p>{{ item1Word }}</p>
         <br />
       </div>
       <div class="grid-item">
-        <input id="item-2" type="text" placeholder="Enter word" />
+        <input
+          @keyup.enter="gameplayEntry()"
+          v-model="item2Word"
+          id="item-2"
+          type="text"
+          placeholder="Enter word"
+        />
+
+        <p>{{ item2Word }}</p>
       </div>
       <div class="grid-item">
         <input id="item-3" type="text" placeholder="Enter word" />
@@ -107,7 +115,7 @@
         <input id="item-25" type="text" placeholder="Enter word" />
       </div>
     </div>
-    <!-- make the conversation boxes for player 'disputes' -->
+    <!-- make the conversation boxes for player 'challenges' -->
   </div>
 </template>
 
@@ -121,11 +129,12 @@ export default {
   },
   data() {
     return {
+      isConnected: false,
       userTopic: "",
       RandomTopic: "",
       playedWord: "",
-      item1: "",
-      item2: "",
+      item1Word: "",
+      item2Word: "",
       item3: "",
       item4: "",
       item5: "",
@@ -170,13 +179,20 @@ export default {
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
     },
+    //send the 'pingServer' event to the server
     gameplayEntry() {
-      axios.post("/enterword", { playedword: this.playedWord });
+      //this.$socket.emit("gameplayEntry", "PING!");
+      axios.post("/enterword", { item1Word: this.item1Word });
+    },
+    playNow() {
+      if (this.RandomTopic != "") {
+        let officialGameTopic = this.userTopic;
+      } else {
+        officialGameTopic = this.RandomTopic;
+      }
+      axios.post("/playnow", { officialGameTopic: officialGameTopic });
     },
   },
-  // mounted() {
-  //   this.getRandomTopic();
-  // }
 };
 </script>
 
@@ -185,6 +201,11 @@ export default {
 h1,
 h2 {
   text-align: center;
+}
+.play-now-topic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .game-board {
   display: grid;

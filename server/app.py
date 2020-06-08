@@ -1,8 +1,9 @@
 from flask import Flask, render_template, jsonify
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
 import requests
 from topicsAPI import topics_api
 from authAPI import auth_api
+from gameplayAPI import gameplay_api
 
 app = Flask(__name__,
             static_folder="./dist/static",
