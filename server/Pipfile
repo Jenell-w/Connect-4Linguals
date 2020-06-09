@@ -9,6 +9,8 @@ verify_ssl = true
 flask = "*"
 requests = "*"
 bcrypt = "*"
+flask-socketio = "*"
+eventlet = "*"
 
 [requires]
 python_version = "3.7"

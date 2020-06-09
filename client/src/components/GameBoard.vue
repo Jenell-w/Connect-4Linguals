@@ -12,23 +12,38 @@
       />
       <br />
       <br />
-      <input type="submit" value="Play Game!" />
       <h3>OR</h3>
-      <button @click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
+      <button @click="getRandomTopic" class="rando-button" type="button">
+        Get a Random Topic
+      </button>
       <h2 v-if="userTopic">{{ userTopic }}</h2>
       <h2 v-else>
         <div>{{ RandomTopic }}</div>
       </h2>
+      <button class="play-now-topic" @click="playNow">Play Now!</button>
     </div>
     <div class="game-board">
       <div class="grid-item">
-        <!-- create "@keyupenter"- word is submitted -->
-        <input v-model="item1" id="item-1" type="text" placeholder="Enter word" />
-        <p>{{ item1 }}</p>
+        <input
+          @keyup.enter="gameplayEntry()"
+          v-model="item1Word"
+          id="item-1"
+          type="text"
+          placeholder="Enter word"
+        />
+        <p>{{ item1Word }}</p>
         <br />
       </div>
       <div class="grid-item">
-        <input id="item-2" type="text" placeholder="Enter word" />
+        <input
+          @keyup.enter="gameplayEntry()"
+          v-model="item2Word"
+          id="item-2"
+          type="text"
+          placeholder="Enter word"
+        />
+
+        <p>{{ item2Word }}</p>
       </div>
       <div class="grid-item">
         <input id="item-3" type="text" placeholder="Enter word" />
@@ -100,6 +115,7 @@
         <input id="item-25" type="text" placeholder="Enter word" />
       </div>
     </div>
+    <!-- make the conversation boxes for player 'challenges' -->
   </div>
 </template>
 
@@ -109,14 +125,17 @@ import axios from "axios";
 export default {
   name: "GameBoard",
   props: {
-    title: String
+    title: String,
   },
   data() {
     return {
+      isConnected: false,
       userTopic: "",
       RandomTopic: "",
-      item1: "",
-      item2: "",
+      playedWord: "",
+      officialGameTopic: "",
+      item1Word: "",
+      item2Word: "",
       item3: "",
       item4: "",
       item5: "",
@@ -139,16 +158,14 @@ export default {
       item22: "",
       item23: "",
       item24: "",
-      item25: ""
+      item25: "",
     };
   },
   methods: {
     getRandomTopic() {
       axios
         .post("/gettopics", { RandomTopic: this.RandomTopic })
-        .then(resp => {
-          // create array of topics, now I must randomly select one of them
-          // resp.data is an Object
+        .then((resp) => {
           let topicList = resp.data;
           let result = [];
           for (let i = 0; i < topicList.length; i++) {
@@ -157,16 +174,28 @@ export default {
           let randTopicSelection = Math.floor(Math.random() * result.length);
           this.RandomTopic = result[randTopicSelection];
         })
-        .catch(error => console.log("error", error));
+        .catch((error) => console.log("error", error));
     },
     //adds the user-entered topic to the db
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
-    }
-  }
-  // mounted() {
-  //   this.getRandomTopic();
-  // }
+    },
+
+    gameplayEntry() {
+      axios.post("/enterword", { item1WordEntered: this.item1Word });
+    },
+    playNow() {
+      if (this.RandomTopic != "") {
+        this.officialGameTopic = this.userTopic;
+      } else {
+        this.officialGameTopic = this.RandomTopic;
+      }
+      console.log(this.officialGameTopic);
+      axios.post("/playnow", {
+        officialGameTopicEntry: this.officialGameTopic,
+      });
+    },
+  },
 };
 </script>
 
@@ -175,6 +204,11 @@ export default {
 h1,
 h2 {
   text-align: center;
+}
+.play-now-topic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .game-board {
   display: grid;
