@@ -20,15 +20,21 @@
         <div>{{ RandomTopic }}</div>
       </h2>
     </div>
+    <!-- <div v-for="(item,index) in items" :key='index' class="game-board">
+      <div class="grid-item">
+        <input type="text" placeholder="Enter word" v-model="currentItem"/>
+          {{currentItem}}
+      </div>
+    </div> -->
+
     <div class="game-board">
       <div class="grid-item">
-        <!-- create "@keyupenter"- word is submitted -->
-        <input v-model="item1" id="item-1" type="text" placeholder="Enter word" />
+        <input @keyup.enter="item1log()" v-model="item1" id="item-1" type="text" placeholder="Enter word" />
         <p>{{ item1 }}</p>
         <br />
       </div>
       <div class="grid-item">
-        <input id="item-2" type="text" placeholder="Enter word" />
+        <input id="item-2" type="text" placeholder="Enter word" v-model="item2" />
       </div>
       <div class="grid-item">
         <input id="item-3" type="text" placeholder="Enter word" />
@@ -98,13 +104,15 @@
       </div>
       <div class="grid-item">
         <input id="item-25" type="text" placeholder="Enter word" />
-      </div>
+      </div> 
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import io from 'socket.io-client';
+var socketGameboard = io.connect('http://127.0.0.1:5000');
 
 export default {
   name: "GameBoard",
@@ -115,6 +123,10 @@ export default {
     return {
       userTopic: "",
       RandomTopic: "",
+      // gridItems: 25,
+      // items: ['item1','item2','item3'],
+      // currentItem: "",
+      // message: 'HI',
       item1: "",
       item2: "",
       item3: "",
@@ -162,6 +174,18 @@ export default {
     //adds the user-entered topic to the db
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
+      this.item1log()
+    },
+    item1log() {
+      console.log('keyup')
+      socketGameboard.emit('item1', this.item1);
+      this.item1 = ''
+    },
+    mounted() {
+      socketGameboard.on('item1', (item1) => {
+        console.log(item1)
+        this.item1 = item1;
+    })
     }
   }
   // mounted() {

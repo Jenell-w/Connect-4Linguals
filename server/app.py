@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify
 import requests
 from topicsAPI import topics_api
 from authAPI import auth_api
+from flask_socketio import SocketIO, send
 
 app = Flask(__name__,
             static_folder="./dist/static",
@@ -10,11 +11,10 @@ app = Flask(__name__,
 app.secret_key = "@H238sd&ew9@#lso@Apso"
 app.register_blueprint(topics_api)
 app.register_blueprint(auth_api)
+socketio = SocketIO(app)
 
 # this is for going directly to home
 
-
-@app.route('/', defaults={'path': ''})
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
@@ -26,6 +26,14 @@ def add_header(req):
     req.headers["Cache-Control"] = "no-cache"
     return req
 
+@socketio.on('message')
+def handle_message(message):
+    send(message, broadcast=True)
+
+@socketio.on('item1')
+def handle_item1(item1):
+    send(item1, broadcast=True)
+    print('Item SENT__________________', item1)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, debug=True)
