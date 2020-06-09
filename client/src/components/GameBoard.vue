@@ -133,6 +133,7 @@ export default {
       userTopic: "",
       RandomTopic: "",
       playedWord: "",
+      officialGameTopic: "",
       item1Word: "",
       item2Word: "",
       item3: "",
@@ -179,18 +180,20 @@ export default {
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
     },
-    //send the 'pingServer' event to the server
+
     gameplayEntry() {
-      //this.$socket.emit("gameplayEntry", "PING!");
-      axios.post("/enterword", { item1Word: this.item1Word });
+      axios.post("/enterword", { item1WordEntered: this.item1Word });
     },
     playNow() {
       if (this.RandomTopic != "") {
-        let officialGameTopic = this.userTopic;
+        this.officialGameTopic = this.userTopic;
       } else {
-        officialGameTopic = this.RandomTopic;
+        this.officialGameTopic = this.RandomTopic;
       }
-      axios.post("/playnow", { officialGameTopic: officialGameTopic });
+      console.log(this.officialGameTopic);
+      axios.post("/playnow", {
+        officialGameTopicEntry: this.officialGameTopic,
+      });
     },
   },
 };
