@@ -1,20 +1,20 @@
 <template>
   <div id="app">
     <GameBoard title="Play Connect 4 Linguals" />
-    <!-- <div> -->
-      <!-- <input type="text" v-model="message"/>
+    <!-- <div>
+      <input type="text" v-model="message"/>
       <button @click='sendMessage'>Submit</button>
       <br>
       {{messageList}}
-    </div> -->
+    </div>  -->
   </div>
 </template>
 
 <script>
 import GameBoard from "../components/GameBoard";
 import { isAuthenticated } from './helpers';
-import io from 'socket.io-client';
-var socket = io.connect('http://127.0.0.1:5000');
+// import io from 'socket.io-client';
+// var socket = io.connect('http://127.0.0.1:5000');
 
 export default {
   name: "App",
@@ -28,10 +28,10 @@ export default {
     }
   },
   methods: {
-      sendMessage() {
-          socket.emit('message', this.message);
-          this.message = '';
-      },
+      // sendMessage() {
+      //     socket.emit('message', this.message);
+      //     this.message = '';
+      // },
   },
   created(){
     
@@ -44,9 +44,9 @@ export default {
         this.userSessionID = data['user']
       }
     })
-    socket.on('message', (message) => {
-        this.messageList.push(message);
-    })
+    // socket.on('message', (message) => {
+    //     this.messageList.push(message);
+    // })
   }
 };
 </script>

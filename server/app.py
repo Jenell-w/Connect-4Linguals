@@ -31,9 +31,9 @@ def handle_message(message):
     send(message, broadcast=True)
 
 @socketio.on('item1')
-def handle_item1(item1):
-    send(item1, broadcast=True)
-    print('Item SENT__________________', item1)
+def handle_item1(message):
+    send(message, broadcast=True)
+    print('Item SENT__________________', message)
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

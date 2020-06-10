@@ -26,10 +26,10 @@
           {{currentItem}}
       </div>
     </div> -->
-
+    message: {{message}}
     <div class="game-board">
       <div class="grid-item">
-        <input @keyup.enter="item1log()" v-model="item1" id="item-1" type="text" placeholder="Enter word" />
+        <input @keyup.enter="sendItem1()" v-model="item1" id="item-1" type="text" placeholder="Enter word" />
         <p>{{ item1 }}</p>
         <br />
       </div>
@@ -112,7 +112,7 @@
 <script>
 import axios from "axios";
 import io from 'socket.io-client';
-var socketGameboard = io.connect('http://127.0.0.1:5000');
+var socket = io.connect('http://127.0.0.1:5000');
 
 export default {
   name: "GameBoard",
@@ -151,7 +151,9 @@ export default {
       item22: "",
       item23: "",
       item24: "",
-      item25: ""
+      item25: "",
+      messageList: [],
+      message: '',
     };
   },
   methods: {
@@ -174,23 +176,18 @@ export default {
     //adds the user-entered topic to the db
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
-      this.item1log()
+      // this.sendItem1()()
     },
-    item1log() {
-      console.log('keyup')
-      socketGameboard.emit('item1', this.item1);
+    sendItem1() {
+      socket.emit('item1', this.item1);
       this.item1 = ''
     },
-    mounted() {
-      socketGameboard.on('item1', (item1) => {
-        console.log(item1)
-        this.item1 = item1;
+  },
+  mounted() {
+    socket.on('message', (message) => {
+      this.item1 = message
     })
-    }
-  }
-  // mounted() {
-  //   this.getRandomTopic();
-  // }
+  },
 };
 </script>
 
