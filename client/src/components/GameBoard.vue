@@ -21,11 +21,11 @@
       </h2>
     </div>
 
-<p>current item: {{submittedItem}}</p>
 <div class="game-board">
     <div v-for="(item, index) in items" :key="index">
       <div class="grid-item">
-        <input @keyup.enter="sendItem(items[index])" type="text" placeholder="Enter word" v-model="items[index]"/>
+        <input @keyup.enter="sendItems()" type="text" placeholder="Enter word" v-model="items[index]"/>
+          {{items[index]}}
       </div>
     </div>
   </div>
@@ -48,7 +48,8 @@ export default {
       RandomTopic: "",
       submittedItem: '',
       currentItem: '',
-      items: ['','','','','','','','','','','','','','','','','','','','','','','','','']
+      items: ['','','','','','','','','','','','','','','','','','','','','','','','',''],
+      submittedIndex: 0,
     };
   },
   methods: {
@@ -71,14 +72,15 @@ export default {
     //adds the user-entered topic to the db
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
-      this.sendItem()
+      this.sendItems()
     },
-    sendItem(item) {
-      socket.emit('item1', item);
+    sendItems() {
+      socket.emit('item1', this.items);
     },
   },
   mounted() {
     socket.on('message', (message) => {
+      this.items = message
       this.submittedItem = message
     })
   },
