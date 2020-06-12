@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ title }}</h1>
+    {{items}}
     <div class="enter-topics-container">
       <h3>Enter a topic</h3>
       <input
@@ -20,107 +21,25 @@
       <h2 v-else>
         <div>{{ RandomTopic }}</div>
       </h2>
-      <button class="play-now-topic" @click="playNow">Play Now!</button>
     </div>
-    <div class="game-board">
-      <div class="grid-item">
-        <input
-          @keyup.enter="gameplayEntry()"
-          v-model="item1Word"
-          id="item-1"
-          type="text"
-          placeholder="Enter word"
-        />
-        <p>{{ item1Word }}</p>
-        <br />
-      </div>
-      <div class="grid-item">
-        <input
-          @keyup.enter="gameplayEntry()"
-          v-model="item2Word"
-          id="item-2"
-          type="text"
-          placeholder="Enter word"
-        />
 
-        <p>{{ item2Word }}</p>
-      </div>
+<div class="game-board">
+    <div v-for="(item, index) in items" :key="index">
       <div class="grid-item">
-        <input id="item-3" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-4" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-5" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-6" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-7" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-8" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-9" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-10" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-11" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-12" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-13" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-14" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-15" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-16" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-17" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-18" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-19" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-20" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-21" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-22" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-23" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-24" type="text" placeholder="Enter word" />
-      </div>
-      <div class="grid-item">
-        <input id="item-25" type="text" placeholder="Enter word" />
+        <input @keyup.enter="sendItems()" type="text" placeholder="Enter word" v-model="items[index]"/>
+          {{items[index]}}
       </div>
     </div>
     <!-- make the conversation boxes for player 'challenges' -->
   </div>
+  </div>
+  <!-- </div> -->
 </template>
 
 <script>
 import axios from "axios";
+import io from 'socket.io-client';
+var socket = io.connect('http://127.0.0.1:5000');
 
 export default {
   name: "GameBoard",
@@ -132,33 +51,14 @@ export default {
       isConnected: false,
       userTopic: "",
       RandomTopic: "",
+      submittedItem: '',
+      currentItem: '',
+      items: ['','','','','','','','','','','','','','','','','','','','','','','','',''],
+      submittedIndex: 0,
       playedWord: "",
       officialGameTopic: "",
       item1Word: "",
       item2Word: "",
-      item3: "",
-      item4: "",
-      item5: "",
-      item6: "",
-      item7: "",
-      item8: "",
-      item9: "",
-      item10: "",
-      item11: "",
-      item12: "",
-      item13: "",
-      item14: "",
-      item15: "",
-      item16: "",
-      item17: "",
-      item18: "",
-      item19: "",
-      item20: "",
-      item21: "",
-      item22: "",
-      item23: "",
-      item24: "",
-      item25: "",
     };
   },
   methods: {
@@ -179,32 +79,27 @@ export default {
     //adds the user-entered topic to the db
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
+      this.sendItems()
     },
-
-    gameplayEntry() {
-      axios.post("/enterword", { item1WordEntered: this.item1Word });
+    sendItems() {
+      socket.emit('item1', this.items);
     },
-    playNow() {
-      if (this.RandomTopic != "") {
-        this.officialGameTopic = this.userTopic;
-      } else {
-        this.officialGameTopic = this.RandomTopic;
-      }
-      console.log(this.officialGameTopic);
-      axios.post("/playnow", {
-        officialGameTopicEntry: this.officialGameTopic,
-      });
-    },
+  },
+  mounted() {
+  socket.on('message', (message) => {
+    this.items = message
+    this.submittedItem = message
+  })
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,
+/* h1,
 h2 {
   text-align: center;
-}
+} */
 .play-now-topic {
   display: flex;
   justify-content: center;
@@ -219,31 +114,5 @@ h2 {
   justify-content: center;
   grid-template-columns: repeat(5, 10vw);
   grid-template-rows: repeat(5, 10vw);
-}
-.grid-item:nth-child(1) {
-  grid-row: 1;
-  grid-column: 1;
-}
-.grid-item:nth-child(2) {
-  grid-row: 1;
-  grid-column: 2;
-}
-.grid-item:nth-child(3) {
-  grid-row: 1;
-  grid-column: 3;
-}
-.grid-item:nth-child(4) {
-  grid-row: 1;
-  grid-column: 4;
-}
-.grid-item:nth-child(5) {
-  grid-row: 1;
-  grid-column: 5;
-}
-.grid.item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: darkgrey;
 }
 </style>

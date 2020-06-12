@@ -42,3 +42,6 @@ def enter_word():
 
     return jsonify(success=True)
     # how can we relate the user in session to the entered word.
+
+
+
