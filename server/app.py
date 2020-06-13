@@ -1,10 +1,9 @@
 from flask import Flask, render_template, jsonify
-from flask_socketio import SocketIO, send, emit
 import requests
 from topicsAPI import topics_api
 from authAPI import auth_api
 from gameplayAPI import gameplay_api
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, send, emit
 
 
 app = Flask(__name__,
@@ -12,11 +11,11 @@ app = Flask(__name__,
             template_folder="./dist"
             )
 app.config['SECRET_KEY'] = 'ohsosecret0987654321'
-socketio = SocketIO(app)
 app.secret_key = "@H238sd&ew9@#lso@Apso"
 app.register_blueprint(topics_api)
 app.register_blueprint(auth_api)
 app.register_blueprint(gameplay_api)
+socketio = SocketIO(app)
 
 # this is for going directly to home
 
@@ -25,7 +24,6 @@ app.register_blueprint(gameplay_api)
 @app.route('/<path:path>')
 def catch_all(path):
     return(render_template('index.html'))
-
 
 @app.after_request
 def add_header(req):
@@ -43,3 +41,4 @@ def handle_item1(message):
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
+

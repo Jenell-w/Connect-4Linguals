@@ -82,6 +82,7 @@ export default {
       this.sendItems()
     },
     sendItems() {
+      console.log('function called')
       socket.emit('item1', this.items);
     },
   },
