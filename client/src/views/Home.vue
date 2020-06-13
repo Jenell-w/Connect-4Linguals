@@ -1,49 +1,48 @@
 <template>
   <div id="app">
+    <StartGame title1="Let's Start a Game" />
     <GameBoard title="Play Connect 4 Linguals" />
     <!-- <div>
       <input type="text" v-model="message"/>
       <button @click='sendMessage'>Submit</button>
       <br>
       {{messageList}}
-    </div>  -->
+    </div>-->
   </div>
 </template>
 
 <script>
 import GameBoard from "../components/GameBoard";
-import { isAuthenticated } from './helpers';
-// import io from 'socket.io-client';
-// var socket = io.connect('http://127.0.0.1:5000');
+import StartGame from "../components/StartGame";
+import { isAuthenticated } from "./helpers";
 
 export default {
   name: "App",
-    components: {
-    GameBoard
+  components: {
+    GameBoard,
+    StartGame
   },
   data() {
     return {
-      message: '',
-      messageList: [],
-    }
+      message: "",
+      messageList: []
+    };
   },
   methods: {
-      // sendMessage() {
-      //     socket.emit('message', this.message);
-      //     this.message = '';
-      // },
+    // sendMessage() {
+    //     socket.emit('message', this.message);
+    //     this.message = '';
+    // },
   },
-  created(){
-    
-  },
+  created() {},
   mounted() {
     isAuthenticated().then(data => {
-      if (data['session'] === false) {
-        this.$router.push('/login')
+      if (data["session"] === false) {
+        this.$router.push("/login");
       } else {
-        this.userSessionID = data['user']
+        this.userSessionID = data["user"];
       }
-    })
+    });
     // socket.on('message', (message) => {
     //     this.messageList.push(message);
     // })

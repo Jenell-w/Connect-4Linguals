@@ -17,31 +17,33 @@ def find_user_id(username):
         "POST", url, headers=headers, data=json.dumps(payload)).json()[0]
     return jsonify(success=True)
 
-
-@gameplay_api.route('/enterword', methods=['GET', 'POST'])
-def enter_word():
-    username = session['user']
-    current_user_id = find_user_id(username)
-    print(current_user_id)
-
-    playedword = request.json['item1Word']
+# could i query without the user in session? why does WHERE NOT not work?
+# do i need to find current user in sessino first?
+@gameplay_api.route('/playerlist', methods=['GET', 'POST'])
+def get_avail_players():
+    user_in_session = session['user']
+    print('-----------', user_in_session)
     payload = {
-        "operation": "insert",
-        "schema": "ConnectLinguals",
-        "table": "games",
-        "records": [
-            {
-                "user_id": current_user_id,
-                "played_word": playedword,
+        "operation": "sql",
+        "sql": "SELECT username FROM ConnectLinguals.users"
 
-            }
-        ]
     }
     response = requests.request(
         "POST", url, headers=headers, data=json.dumps(payload))
+    username_list = response.text.encode('utf8')
+    payload = {
+        "operation": "search_by_value",
+        "schema": "ConnectLinguals",
+        "table": "games",
+        "search_attribute": "Player1_username",
+        "search_value": "*",
+        "get_attributes": ["Player1_username", "Player2_username"]
+    }
+    response2 = requests.request(
+        "POST", url, headers=headers, data=json.dumps(payload))
+    players_playing = response2.text.encode('utf8')
+    # thisis returning 2 arrays next to each other, how can we make them together as 1 array
 
-    return jsonify(success=True)
+    return (username_list + players_playing)
+
     # how can we relate the user in session to the entered word.
-
-
-
