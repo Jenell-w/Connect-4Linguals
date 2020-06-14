@@ -55,10 +55,7 @@ export default {
       currentItem: '',
       items: ['','','','','','','','','','','','','','','','','','','','','','','','',''],
       submittedIndex: 0,
-      playedWord: "",
       officialGameTopic: "",
-      item1Word: "",
-      item2Word: "",
     };
   },
   methods: {
@@ -82,8 +79,7 @@ export default {
       this.sendItems()
     },
     sendItems() {
-      console.log('function called')
-      socket.emit('item1', this.items);
+      socket.emit('gameboard', this.items);
     },
   },
   mounted() {
