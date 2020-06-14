@@ -2,8 +2,8 @@
   <div>
     <div class="dropdown">
       <p>Pick a Player to play against!</p>
-      <select id="player-list" v-model="playerList" name="Select an opponent">
-        <option v-for="player in playerList" :value="player" :key="player">{{ player }}</option>
+      <select id="player-list" v-model="player" name="Select an opponent">
+        <option v-for="player in playerList" :value="player.username">{{ player }}</option>
       </select>
     </div>
     <div class="enter-topics-container">
@@ -23,8 +23,9 @@
       <h2 v-else>
         <div>{{ RandomTopic }}</div>
       </h2>
+      <button class="playnow" @click="playNow" type="button">Play Now!</button>
     </div>
-    <GameBoard />
+    <GameBoard v-if="showBoard = true" />
   </div>
 </template>
 
@@ -47,7 +48,8 @@ export default {
       userTopic: "",
       RandomTopic: "",
       playerList: [],
-      player: ""
+      player: "",
+      showBoard: false
     };
   },
   methods: {
@@ -89,13 +91,15 @@ export default {
           }
           //this shoudl take out those in active_players but it is not working
           let avail_players = all_users.filter(
-            item => !active_players.includes(item.username)
+            item => !active_players.includes(item)
           );
-          console.log(avail_players);
           this.playerList = avail_players;
-          this.player = this.playerList[0].username;
         });
     },
+    playNow() {
+      this.showBoard = true;
+    },
+
     sendItems() {
       socket.emit("item1", this.items);
     }

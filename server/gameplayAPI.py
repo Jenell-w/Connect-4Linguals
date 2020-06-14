@@ -36,7 +36,6 @@ def get_players_in_games():
         "POST", url, headers=headers, data=json.dumps(payload)).json()
     return jsonify(players_active)
 
-
 @gameplay_api.route('/startgame', methods=['POST', 'GET'])
 def get_gameboard_started():
     # if board is not empty, retrieve game_id and players
