@@ -19,7 +19,6 @@ import { isAuthenticated } from "./helpers";
 export default {
   name: "App",
   components: {
-    GameBoard,
     StartGame
   },
   data() {
@@ -28,13 +27,6 @@ export default {
       messageList: []
     };
   },
-  methods: {
-    // sendMessage() {
-    //     socket.emit('message', this.message);
-    //     this.message = '';
-    // },
-  },
-  created() {},
   mounted() {
     isAuthenticated().then(data => {
       if (data["session"] === false) {
@@ -42,10 +34,7 @@ export default {
       } else {
         this.userSessionID = data["user"];
       }
-    });
-    // socket.on('message', (message) => {
-    //     this.messageList.push(message);
-    // })
+    })
   }
 };
 </script>
