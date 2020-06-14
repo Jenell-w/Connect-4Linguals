@@ -6,7 +6,6 @@ from flask_socketio import SocketIO, emit
 
 gameplay_api = Blueprint('gameplay_api', __name__)
 
-
 @gameplay_api.route('/userlist', methods=['GET', 'POST'])
 def get_all_users():
     payload = {
@@ -39,18 +38,21 @@ def get_players_in_games():
 @gameplay_api.route('/startgame', methods=['POST', 'GET'])
 def get_gameboard_started():
     # if board is not empty, retrieve game_id and players
-    player_in_session = session['user']
-    played_word = request.json['playedword']
+    player1_in_session = session['user']
+    print(player1_in_session)
+    player2_selected = request.json['player']
+    print(player2_selected)
+    board = "[ "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" ]"
     official_game_topic = request.json['officialGameTopic']
-    board = request.json['board']
+    print(official_game_topic)
     payload = {
         "operation": "insert",
         "schema": "ConnectLinguals",
         "table": "games",
         "records": [
             {
-                "Player1_username": player_in_session,
-                "Player2_username": "",
+                "Player1_username": player1_in_session,
+                "Player2_username": player2_selected,
                 "board": board,
                 "official_game_topic": official_game_topic,
                 "winner": ""
@@ -60,3 +62,4 @@ def get_gameboard_started():
     response = requests.request(
         "POST", url, headers=headers, data=json.dumps(payload))
     return jsonify(success=True)
+
