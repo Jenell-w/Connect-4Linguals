@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, jsonify, request, session, g
 import requests
 import json
 from harperdb_instance import url, headers
@@ -7,30 +7,23 @@ from flask_socketio import SocketIO, emit
 gameplay_api = Blueprint('gameplay_api', __name__)
 
 
-def find_user_id(username):
+@gameplay_api.route('/userlist', methods=['GET', 'POST'])
+def get_all_users():
     payload = {
-        "operation": "sql",
-        "sql": "SELECT id FROM ConnectLinguals.users where username = {}".format(username)
+        "operation": "search_by_value",
+        "schema": "ConnectLinguals",
+        "table": "users",
+        "search_attribute": "username",
+        "search_value": "*",
+        "get_attributes": ["username"]
     }
+    username_list = requests.request(
+        "POST", url, headers=headers, data=json.dumps(payload)).json()
+    return jsonify(username_list)
 
-    response = requests.request(
-        "POST", url, headers=headers, data=json.dumps(payload)).json()[0]
-    return jsonify(success=True)
 
-# could i query without the user in session? why does WHERE NOT not work?
-# do i need to find current user in sessino first?
-@gameplay_api.route('/playerlist', methods=['GET', 'POST'])
-def get_avail_players():
-    user_in_session = session['user']
-    print('-----------', user_in_session)
-    payload = {
-        "operation": "sql",
-        "sql": "SELECT username FROM ConnectLinguals.users"
-
-    }
-    response = requests.request(
-        "POST", url, headers=headers, data=json.dumps(payload))
-    username_list = response.text.encode('utf8')
+@gameplay_api.route('/currentplayerlist', methods=['GET', 'POST'])
+def get_players_in_games():
     payload = {
         "operation": "search_by_value",
         "schema": "ConnectLinguals",
@@ -39,11 +32,32 @@ def get_avail_players():
         "search_value": "*",
         "get_attributes": ["Player1_username", "Player2_username"]
     }
-    response2 = requests.request(
+    players_active = requests.request(
+        "POST", url, headers=headers, data=json.dumps(payload)).json()
+    return jsonify(players_active)
+
+
+@gameplay_api.route('/startgame', methods=['POST', 'GET'])
+def get_gameboard_started():
+    # if board is not empty, retrieve game_id and players
+    player_in_session = session['user']
+    played_word = request.json['playedword']
+    official_game_topic = request.json['officialGameTopic']
+    board = request.json['board']
+    payload = {
+        "operation": "insert",
+        "schema": "ConnectLinguals",
+        "table": "games",
+        "records": [
+            {
+                "Player1_username": player_in_session,
+                "Player2_username": "",
+                "board": board,
+                "official_game_topic": official_game_topic,
+                "winner": ""
+            }
+        ]
+    }
+    response = requests.request(
         "POST", url, headers=headers, data=json.dumps(payload))
-    players_playing = response2.text.encode('utf8')
-    # thisis returning 2 arrays next to each other, how can we make them together as 1 array
-
-    return (username_list + players_playing)
-
-    # how can we relate the user in session to the entered word.
+    return jsonify(success=True)

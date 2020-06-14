@@ -2,13 +2,9 @@
   <div>
     <div class="dropdown">
       <p>Pick a Player to play against!</p>
-      <form>
-        <select name="dropdown">
-          <option value="Players" selected>Player List</option>
-        </select>
-      </form>
-      <button @click="getPlayerList">get list</button>
-      {{ playerList }}
+      <select id="player-list" v-model="playerList" name="Select an opponent">
+        <option v-for="player in playerList" :value="player" :key="player">{{ player }}</option>
+      </select>
     </div>
     <div class="enter-topics-container">
       <h3>Enter a topic</h3>
@@ -50,7 +46,8 @@ export default {
     return {
       userTopic: "",
       RandomTopic: "",
-      playerList: ""
+      playerList: [],
+      player: ""
     };
   },
   methods: {
@@ -75,24 +72,36 @@ export default {
     },
     getPlayerList() {
       axios
-        .post("/playerlist", { playerList: this.playerList })
-        .then(resp => {
-          let playerList = resp.data;
-          this.playerList = resp.data;
-          let result = [];
-          for (let i = 0; i < playerList.length; i++) {
-            result.push(playerList[i].Player1_username);
+        .all([axios.post("/currentplayerlist"), axios.post("/userlist")])
+        .then(respArr => {
+          let currentPlayerList = respArr[0].data;
+          let allUserList = respArr[1].data;
+          let active_players = [];
+          let all_users = [];
+          for (let i = 0; i < currentPlayerList.length; i++) {
+            active_players.push(currentPlayerList[i].Player1_username);
+            active_players.push(currentPlayerList[i].Player2_username);
           }
-          console.log(result);
-          result = getPlayerList.json;
-          console.log(getPlayerList);
-        })
-
-        .catch(error => console.log("error", error));
+          //active_players is list of current players
+          //all_users is a list of all users
+          for (let i = 0; i < allUserList.length; i++) {
+            all_users.push(allUserList[i].username);
+          }
+          //this shoudl take out those in active_players but it is not working
+          let avail_players = all_users.filter(
+            item => !active_players.includes(item.username)
+          );
+          console.log(avail_players);
+          this.playerList = avail_players;
+          this.player = this.playerList[0].username;
+        });
     },
     sendItems() {
       socket.emit("item1", this.items);
     }
+  },
+  mounted() {
+    this.getPlayerList();
   }
 };
 </script>
