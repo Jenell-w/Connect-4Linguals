@@ -1,31 +1,43 @@
 <template>
   <div>
-    <div class="dropdown">
-      <p>Pick a Player to play against!</p>
-      <select id="player-list" v-model="player" name="Select an opponent">
-        <option v-for="player in playerList" :value="player.username">{{ player }}</option>
-      </select>
+    <div id="directions" class="modal" ref="modal">
+      <!-- Modal content -->
+      <div class="modal-content" ref="modalContent">
+        <div class="modal-body">
+          <span @click="$refs.modal.style.display='none'" class="close">&times;</span>
+          <button class="button" @click="getDirections">How Do I Play?{{this.modalText}}</button>
+        </div>
+      </div>
     </div>
-    <div class="enter-topics-container">
-      <h3>Enter a topic</h3>
-      <input
-        v-model="userTopic"
-        @keyup.enter="addTopicToDB"
-        type="text"
-        name="user-topic"
-        id="user-topic"
-      />
-      <br />
-      <br />
-      <h3>OR</h3>
-      <button @click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
-      <h2 v-if="userTopic">{{ userTopic }}</h2>
-      <h2 v-else>
-        <div>{{ RandomTopic }}</div>
-      </h2>
-      <button class="playnow" @click="playNow" type="button">Play Now!</button>
+    <div v-if="showStartGameInfo" class="Startgame">
+      <div class="dropdown">
+        <p>Pick a Player to play against!</p>
+        <select id="player-list" @change="getPlayer2()" v-model="player" name="Select an opponent">
+          <option v-for="player in playerList" :key="player" :value="player">{{ player }}</option>
+        </select>
+      </div>
+
+      <div class="enter-topics-container">
+        <h3>Enter a topic and press enter!</h3>
+        <input
+          v-model="userTopic"
+          @keyup.enter="addTopicToDB"
+          type="text"
+          name="user-topic"
+          id="user-topic"
+        />
+        <br />
+        <br />
+        <h3>OR</h3>
+        <button @click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
+        <h2 v-if="userTopic">{{ userTopic }}</h2>
+        <h2 v-else>
+          <div>{{ RandomTopic }}</div>
+        </h2>
+        <button class="playnow" @click="playNow" type="button">Play Now!</button>
+      </div>
     </div>
-    <GameBoard v-if="showBoard = true" />
+    <GameBoard v-if="showBoard" />
   </div>
 </template>
 
@@ -49,10 +61,20 @@ export default {
       RandomTopic: "",
       playerList: [],
       player: "",
-      showBoard: false
+      player2: "",
+      officialGameTopic: "",
+      showBoard: false,
+      showStartGameInfo: true,
+      modalText: "",
+      Directions: "Directions for Game Play"
     };
   },
   methods: {
+    getDirections() {
+      this.modalText =
+        "Select an available opponent to play against and a game topic.  Then, each player will enter a word relating to the topic in a box so as to get 4 in a row in any direction. Players have the option to 'challenge' the item written.";
+      this.openModal();
+    },
     getRandomTopic() {
       axios
         .post("/gettopics", { RandomTopic: this.RandomTopic })
@@ -70,8 +92,8 @@ export default {
     //adds the user-entered topic to the db
     addTopicToDB() {
       axios.post("/addtopic", { topic: this.userTopic });
-      //this.sendItems();
     },
+    //the current user in session is coming up in this list
     getPlayerList() {
       axios
         .all([axios.post("/currentplayerlist"), axios.post("/userlist")])
@@ -89,15 +111,38 @@ export default {
           for (let i = 0; i < allUserList.length; i++) {
             all_users.push(allUserList[i].username);
           }
-          //this shoudl take out those in active_players but it is not working
           let avail_players = all_users.filter(
             item => !active_players.includes(item)
           );
           this.playerList = avail_players;
         });
     },
+    getPlayer2() {
+      return this.player;
+    },
     playNow() {
+      this.officialGameTopic = this.userTopic + this.RandomTopic;
+      console.log("playnow official game topic,", this.officialGameTopic);
+      axios.post("/startgame", {
+        player: this.player,
+        officialGameTopic: this.officialGameTopic
+      });
       this.showBoard = true;
+      this.showStartGameInfo = false;
+    },
+    openModal() {
+      let modal = this.$refs.modal;
+      let modalContent = this.$refs.modalContent;
+      modal.style.display = "block";
+      setTimeout(function() {
+        modalContent.classList.add("animate-down");
+        modal.classList.add("fade-out");
+      }, 20000);
+      setTimeout(function() {
+        modal.style.display = "none";
+      }, 20000);
+      modal.classList.remove("animate-down");
+      modal.classList.remove("fade-out");
     },
 
     sendItems() {
@@ -106,6 +151,14 @@ export default {
   },
   mounted() {
     this.getPlayerList();
+  },
+  watch: {
+    player() {
+      console.log("my watcher", this.player);
+    },
+    topic() {
+      console.log("my topic", this.officialGameTopic);
+    }
   }
 };
 </script>

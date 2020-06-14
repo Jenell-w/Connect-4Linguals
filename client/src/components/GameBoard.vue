@@ -63,18 +63,19 @@ export default {
         ""
       ],
       submittedIndex: 0,
-      officialGameTopic: "",
+      officialGameTopic: ""
     };
   },
+  //retrieve officialgame topic to post at top of board
   methods: {
-    //adds the user-entered topic to the db
-    addTopicToDB() {
-      axios.post("/addtopic", { topic: this.userTopic });
-      this.sendItems();
+    //need to make chat button
+    //need to get current game baord to retrieve for prior users
+    getCurrentGameBoard() {
+      axios.post();
     },
     sendItems() {
-      socket.emit('gameboard', this.items);
-    },
+      socket.emit("gameboard", this.items);
+    }
   },
   mounted() {
     socket.on("message", message => {
