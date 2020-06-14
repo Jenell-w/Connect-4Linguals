@@ -1,36 +1,38 @@
 <template>
   <div id="app">
-    <GameBoard title="Play Connect 4 Linguals" />
+    <StartGame title1="Let's Start a Game" />
+    <!-- <GameBoard title="Play Connect 4 Linguals" /> -->
+    <!-- <div>
+      <input type="text" v-model="message"/>
+      <button @click='sendMessage'>Submit</button>
+      <br>
+      {{messageList}}
+    </div>-->
   </div>
 </template>
 
 <script>
 import GameBoard from "../components/GameBoard";
-import { isAuthenticated } from './helpers';
-
+import StartGame from "../components/StartGame";
+import { isAuthenticated } from "./helpers";
 
 export default {
   name: "App",
-    components: {
-    GameBoard
+  components: {
+    StartGame
   },
   data() {
     return {
-      message: '',
-      messageList: [],
-    }
-  },
-  methods: {
-  },
-  created(){
-    
+      message: "",
+      messageList: []
+    };
   },
   mounted() {
     isAuthenticated().then(data => {
-      if (data['session'] === false) {
-        this.$router.push('/login')
+      if (data["session"] === false) {
+        this.$router.push("/login");
       } else {
-        this.userSessionID = data['user']
+        this.userSessionID = data["user"];
       }
     })
   }

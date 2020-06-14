@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, jsonify, request, session, g
 import requests
 import json
 from harperdb_instance import url, headers
@@ -7,41 +7,56 @@ from flask_socketio import SocketIO, emit
 gameplay_api = Blueprint('gameplay_api', __name__)
 
 
-def find_user_id(username):
+@gameplay_api.route('/userlist', methods=['GET', 'POST'])
+def get_all_users():
     payload = {
-        "operation": "sql",
-        "sql": "SELECT id FROM ConnectLinguals.users where username = {}".format(username)
+        "operation": "search_by_value",
+        "schema": "ConnectLinguals",
+        "table": "users",
+        "search_attribute": "username",
+        "search_value": "*",
+        "get_attributes": ["username"]
     }
+    username_list = requests.request(
+        "POST", url, headers=headers, data=json.dumps(payload)).json()
+    return jsonify(username_list)
 
-    response = requests.request(
-        "POST", url, headers=headers, data=json.dumps(payload)).json()[0]
-    return jsonify(success=True)
 
+@gameplay_api.route('/currentplayerlist', methods=['GET', 'POST'])
+def get_players_in_games():
+    payload = {
+        "operation": "search_by_value",
+        "schema": "ConnectLinguals",
+        "table": "games",
+        "search_attribute": "Player1_username",
+        "search_value": "*",
+        "get_attributes": ["Player1_username", "Player2_username"]
+    }
+    players_active = requests.request(
+        "POST", url, headers=headers, data=json.dumps(payload)).json()
+    return jsonify(players_active)
 
-@gameplay_api.route('/enterword', methods=['GET', 'POST'])
-def enter_word():
-    username = session['user']
-    current_user_id = find_user_id(username)
-    print(current_user_id)
-
-    playedword = request.json['item1Word']
+@gameplay_api.route('/startgame', methods=['POST', 'GET'])
+def get_gameboard_started():
+    # if board is not empty, retrieve game_id and players
+    player_in_session = session['user']
+    played_word = request.json['playedword']
+    official_game_topic = request.json['officialGameTopic']
+    board = request.json['board']
     payload = {
         "operation": "insert",
         "schema": "ConnectLinguals",
         "table": "games",
         "records": [
             {
-                "user_id": current_user_id,
-                "played_word": playedword,
-
+                "Player1_username": player_in_session,
+                "Player2_username": "",
+                "board": board,
+                "official_game_topic": official_game_topic,
+                "winner": ""
             }
         ]
     }
     response = requests.request(
         "POST", url, headers=headers, data=json.dumps(payload))
-
     return jsonify(success=True)
-    # how can we relate the user in session to the entered word.
-
-
-
