@@ -69,6 +69,7 @@ export default {
   //retrieve officialgame topic to post at top of board
   methods: {
     //need to make chat button
+    //need to get current game baord to retrieve for prior users
     getCurrentGameBoard() {
       axios.post();
     },
