@@ -3,6 +3,7 @@ import requests
 import json
 from harperdb_instance import url, headers
 from flask_socketio import SocketIO, emit
+from helpers import find_game, update_board
 
 gameplay_api = Blueprint('gameplay_api', __name__)
 
@@ -41,7 +42,6 @@ def get_gameboard_started():
     player1_in_session = session['user']
     print(player1_in_session)
     player2_selected = request.json['player']
-    print(player2_selected)
     board = "[ "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" ]"
     official_game_topic = request.json['officialGameTopic']
     print(official_game_topic)
@@ -53,7 +53,7 @@ def get_gameboard_started():
             {
                 "Player1_username": player1_in_session,
                 "Player2_username": player2_selected,
-                "board": board,
+                "board": "{}".format(board),
                 "official_game_topic": official_game_topic,
                 "winner": ""
             }
@@ -63,3 +63,27 @@ def get_gameboard_started():
         "POST", url, headers=headers, data=json.dumps(payload))
     return jsonify(success=True)
 
+@gameplay_api.route('/userchallenge', methods=['POST'])
+def update_challenges():
+    usernamesession = session['user']
+    game = find_game(usernamesession)
+    challenge_reason = request.json['challengeReason']
+    comment = request.json['challengeComment']
+    print(comment)
+    payload = {
+            "operation":"update",
+            "schema":"ConnectLinguals",
+            "table":"games",
+            "records": [
+                {
+                    "id": "{}".format(game),
+                    "challenge_reason": challenge_reason,
+                    "challenge_comments": comment
+                },
+            ]
+        }
+    # try: 
+    #     response = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]
+    # except:
+        # print('no value found')
+    return jsonify(success=True)

@@ -14,10 +14,31 @@
           {{items[index]}}
         </div>
       </div>
-      <!-- make the conversation boxes for player 'challenges' -->
+    </div>
+    <!-- challenge boxes for players to contest a word -->
+    <div id="challenge-word">
+      <label for="challenge-other-players-word">Challenge Your Opponent's Latest Entry:</label>
+      <br />
+      <select
+        class="challenge"
+        @change="submitChallengeReasons()"
+        name="challenge-other-players-word"
+        v-model="reason"
+      >
+        <option v-for="reason in challengeReasons" :key="reason" :value="reason">{{ reason }}</option>
+      </select>
+      <br />
+      <span class="reason">{{ reason }}</span>
+      <br />
+      <div v-if="reason === 'Other'" class="challenge-comment-box">
+        <label for="challenge-comment">Comment/Other Reason for Challenge:</label>
+        <br />
+        <textarea v-model="challengeComment" name="other-challenge" rows="4" cols="50"></textarea>
+        <br />
+        <span class="challenge-comment">{{ challengeComment }}</span>
+      </div>
     </div>
   </div>
-  <!-- </div> -->
 </template>
 
 <script>
@@ -33,6 +54,14 @@ export default {
   data() {
     return {
       isConnected: false,
+      reason: "",
+      challengeReasons: [
+        "Spelling error",
+        "Off-topic",
+        "Invalid entry",
+        "Other"
+      ],
+      challengeComment: "",
       submittedItem: "",
       currentItem: "",
       items: [
@@ -68,6 +97,13 @@ export default {
   },
   //retrieve officialgame topic to post at top of board
   methods: {
+    submitChallengeReasons() {
+      axios.post("/userchallenge", {
+        challengeReason: this.reason,
+        challengeComment: this.challengeComment
+      });
+    },
+
     //need to make chat button
     //need to get current game baord to retrieve for prior users
     getCurrentGameBoard() {
@@ -88,15 +124,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* h1,
-h2 {
-  text-align: center;
-} */
-.play-now-topic {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 .game-board {
   display: grid;
   grid-gap: 2rem;
@@ -106,5 +133,12 @@ h2 {
   justify-content: center;
   grid-template-columns: repeat(5, 10vw);
   grid-template-rows: repeat(5, 10vw);
+}
+.reason,
+.challenge-comment {
+  text-align: center;
+  margin: 10px;
+  justify-content: center;
+  font-style: italic;
 }
 </style>

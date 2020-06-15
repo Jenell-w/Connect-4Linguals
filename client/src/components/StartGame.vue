@@ -37,7 +37,8 @@
         <button class="playnow" @click="playNow" type="button">Play Now!</button>
       </div>
     </div>
-    <GameBoard v-if="showBoard" />
+    <GameBoard />
+    <!-- v-if="showBoard" /> -->
   </div>
 </template>
 

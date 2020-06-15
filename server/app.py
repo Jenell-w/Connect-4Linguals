@@ -5,6 +5,7 @@ from authAPI import auth_api
 from gameplayAPI import gameplay_api
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from harperdb_instance import url, headers
+from helpers import find_game, update_board
 import json
 
 
@@ -32,44 +33,7 @@ def add_header(req):
     req.headers["Cache-Control"] = "no-cache"
     return req
 
-#helper functions
-def find_game(username):
-    username_values = ["Player1_username","Player2_username"]
-    game_id = ''
-    for name in username_values:
-        payload = {
-            "operation":"search_by_value",
-            "schema":"ConnectLinguals",
-            "table":"games",
-            "search_attribute":name,
-            "search_value":"{}".format(username),
-            "get_attributes": ["*"]
-        } 
-        try: 
-            game_id = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]['id']
-        except:
-            print('no value found')
-    return game_id
-
-def update_board(board):
-    usernamesession = session['user']
-    game = find_game(usernamesession)
-    payload = {
-            "operation":"update",
-            "schema":"ConnectLinguals",
-            "table":"games",
-            "records": [
-                {
-                    "id": "{}".format(game),
-                    "board": "{}".format(board)
-                },
-            ]
-        }
-    try: 
-        response = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]['board']
-    except:
-        print('no value found')
-    return response
+#helper functions are now in helpers.py
 
 
 @socketio.on('message')
