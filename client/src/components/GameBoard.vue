@@ -1,7 +1,5 @@
 <template>
   <div class="hello">
-    <h1>{{ title }}</h1>
-    {{items}}
     <div class="game-board">
       <div v-for="(item, index) in items" :key="index">
         <div class="grid-item">
@@ -16,7 +14,7 @@
       </div>
     </div>
     <!-- challenge boxes for players to contest a word -->
-    <div id="challenge-word">
+    <div class="challenge-word">
       <label for="challenge-other-players-word">Challenge Your Opponent's Latest Entry:</label>
       <br />
       <select
@@ -95,9 +93,10 @@ export default {
       officialGameTopic: ""
     };
   },
-  //retrieve officialgame topic to post at top of board
   methods: {
     submitChallengeReasons() {
+      //let challengeReason = this.reason;
+      console.log("challenge reason is ", this.reason);
       axios.post("/userchallenge", {
         challengeReason: this.reason,
         challengeComment: this.challengeComment
@@ -137,8 +136,16 @@ export default {
 .reason,
 .challenge-comment {
   text-align: center;
-  margin: 10px;
+  margin: 20px;
   justify-content: center;
   font-style: italic;
+}
+.challenge-word {
+  text-align: center;
+  margin: 20px;
+  justify-content: center;
+}
+.grid-item {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 </style>

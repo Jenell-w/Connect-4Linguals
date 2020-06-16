@@ -55,7 +55,9 @@ def get_gameboard_started():
                 "Player2_username": player2_selected,
                 "board": "{}".format(board),
                 "official_game_topic": official_game_topic,
-                "winner": ""
+                "winner": "",
+                "challenge_reason": "",
+                "challenge_comments": ""
             }
         ]
     }
@@ -63,11 +65,12 @@ def get_gameboard_started():
         "POST", url, headers=headers, data=json.dumps(payload))
     return jsonify(success=True)
 
-@gameplay_api.route('/userchallenge', methods=['POST'])
+@gameplay_api.route('/userchallenge', methods=['POST', 'GET'])
 def update_challenges():
     usernamesession = session['user']
     game = find_game(usernamesession)
     challenge_reason = request.json['challengeReason']
+    print(challenge_reason)
     comment = request.json['challengeComment']
     print(comment)
     payload = {
@@ -82,8 +85,8 @@ def update_challenges():
                 },
             ]
         }
-    # try: 
-    #     response = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]
-    # except:
-        # print('no value found')
+    try: 
+        response = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]
+    except:
+        print('no value found')
     return jsonify(success=True)

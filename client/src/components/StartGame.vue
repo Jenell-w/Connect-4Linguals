@@ -27,8 +27,7 @@
           id="user-topic"
         />
         <br />
-        <br />
-        <h3>OR</h3>
+        <h4>OR</h4>
         <button @click="getRandomTopic" class="rando-button" type="button">Get a Random Topic</button>
         <h2 v-if="userTopic">{{ userTopic }}</h2>
         <h2 v-else>
@@ -164,4 +163,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.Startgame {
+  justify-content: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+</style>
