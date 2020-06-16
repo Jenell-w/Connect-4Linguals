@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
-    <h1>Topic: {{gameData.official_game_topic}}</h1><br>
+    <h1>Topic: {{gameData.official_game_topic}}</h1>
+    <br />
     <h3>Player1: {{gameData.Player1_username}}</h3>
     <h3>Player2: {{gameData.Player2_username}}</h3>
     <div class="game-board">
@@ -12,12 +13,40 @@
             placeholder="Enter word"
             v-model="gameboardData[index]"
           />
+          {{ gameboardData[index]}}
         </div>
       </div>
-      <!-- make the conversation boxes for player 'challenges' -->
+    </div>
+    <div class="challenge-word">
+      <label for="challenge-other-players-word">Challenge Your Opponent's Latest Entry:</label>
+      <br />
+      <select
+        class="challenge"
+        @change="submitChallengeReasons()"
+        name="challenge-other-players-word"
+        v-model="reason"
+      >
+        <option v-for="reason in challengeReasons" :key="reason" :value="reason">{{ reason }}</option>
+      </select>
+      <br />
+      <span class="reason">{{ gameData.challenge_reason }}</span>
+      <br />
+      <div v-if="reason === 'Other'" class="challenge-comment-box">
+        <label for="challenge-comment">Comment/Other Reason for Challenge:</label>
+        <br />
+        <span class="challenge-comment">{{ gameData.challenge_comments }}</span>
+        <br />
+        <textarea
+          @keyup.enter="submitChallengeReasons"
+          v-model="challengeComment"
+          name="other-challenge"
+          rows="4"
+          cols="50"
+        ></textarea>
+        <br />
+      </div>
     </div>
   </div>
-  <!-- </div> -->
 </template>
 
 <script>
@@ -29,11 +58,19 @@ export default {
   name: "GameBoard",
   props: {
     title: String,
-    gameData: Object,
+    gameData: Object
   },
   data() {
     return {
       isConnected: false,
+      challengeReasons: [
+        "Spelling error",
+        "Off-topic",
+        "Invalid entry",
+        "Other"
+      ],
+      reason: "",
+      challengeComment: "",
       submittedItem: "",
       currentItem: "",
       gameboardData: [],
@@ -41,35 +78,34 @@ export default {
       officialGameTopic: ""
     };
   },
-  //retrieve officialgame topic to post at top of board
   methods: {
-    //need to make chat button
-    //need to get current game baord to retrieve for prior users
-    getCurrentGameBoard() {
-      axios.post();
+    submitChallengeReasons() {
+      axios.post("/userchallenge", {
+        reason: this.reason,
+        challengeComment: this.challengeComment
+      });
     },
     sendItems() {
       socket.emit("gameboard", this.gameboardData);
     },
     changeGameboardToArray() {
-      this.gameboardData = this.gameData.board.replace('[', '').replace(']', '').split(',')
+      this.gameboardData = this.gameData.board
+        .replace("[", "")
+        .replace("]", "")
+        .split(",");
     }
   },
   mounted() {
     socket.on("gameboard", message => {
       this.gameboardData = message;
     });
-    this.changeGameboardToArray()
+    this.changeGameboardToArray();
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* h1,
-h2 {
-  text-align: center;
-} */
 .play-now-topic {
   display: flex;
   justify-content: center;
@@ -84,5 +120,21 @@ h2 {
   justify-content: center;
   grid-template-columns: repeat(5, 10vw);
   grid-template-rows: repeat(5, 10vw);
+}
+.reason,
+.challenge-comment {
+  text-align: center;
+  margin: 20px;
+  justify-content: center;
+  font-style: italic;
+  font-weight: bold;
+}
+.challenge-word {
+  text-align: center;
+  margin: 20px;
+  justify-content: center;
+}
+.grid-item {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 </style>

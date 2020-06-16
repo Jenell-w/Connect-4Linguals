@@ -37,10 +37,7 @@
         <button class="playnow" @click="playNow" type="button">Play Now!</button>
       </div>
     </div>
-    <GameBoard 
-      v-if="showBoard" 
-      :gameData="gameData"
-    />
+    <GameBoard v-if="showBoard" :gameData="gameData" />
   </div>
 </template>
 
@@ -53,7 +50,7 @@ var socket = io.connect("http://127.0.0.1:5000");
 export default {
   name: "StartGame",
   props: {
-    title1: String,
+    title1: String
   },
   components: {
     GameBoard
@@ -70,7 +67,7 @@ export default {
       showStartGameInfo: true,
       modalText: "",
       Directions: "Directions for Game Play",
-      gameData: null,
+      gameData: null
     };
   },
   methods: {
@@ -127,13 +124,15 @@ export default {
     playNow() {
       this.officialGameTopic = this.userTopic + this.RandomTopic;
       console.log("playnow official game topic,", this.officialGameTopic);
-      axios.post("/startgame", {
-        player: this.player,
-        officialGameTopic: this.officialGameTopic
-      }).then(() => {
-        this.joinRoom()
-        this.checkIfGame()
-      })
+      axios
+        .post("/startgame", {
+          player: this.player,
+          officialGameTopic: this.officialGameTopic
+        })
+        .then(() => {
+          this.joinRoom();
+          this.checkIfGame();
+        });
     },
     openModal() {
       let modal = this.$refs.modal;
@@ -154,32 +153,23 @@ export default {
       socket.emit("join", this.player);
     },
     checkIfGame() {
-      axios.get("/checkifingame")
-      .then(resp => {
-        console.log(resp.data.success)
-        console.log(resp.data.success.game === "nogame")
+      axios.get("/checkifingame").then(resp => {
+        console.log(resp.data.success);
+        console.log(resp.data.success.game === "nogame");
         if (resp.data.success.game === "nogame") {
           this.showBoard = false;
           this.showStartGameInfo = true;
         } else {
           this.showBoard = true;
           this.showStartGameInfo = false;
-          this.gameData = resp.data.success
+          this.gameData = resp.data.success;
         }
-      })
-    },
+      });
+    }
   },
   mounted() {
     this.getPlayerList();
     this.checkIfGame();
-  },
-  watch: {
-    player() {
-      console.log("my watcher", this.player);
-    },
-    topic() {
-      console.log("my topic", this.officialGameTopic);
-    }
   }
 };
 </script>
