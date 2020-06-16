@@ -1,17 +1,17 @@
 <template>
   <div class="hello">
-    <h1>{{ title }}</h1>
-    {{items}}
+    <h1>Topic: {{gameData.official_game_topic}}</h1><br>
+    <h3>Player1: {{gameData.Player1_username}}</h3>
+    <h3>Player2: {{gameData.Player2_username}}</h3>
     <div class="game-board">
-      <div v-for="(item, index) in items" :key="index">
+      <div v-for="(item, index) in gameboardData" :key="index">
         <div class="grid-item">
           <input
             @keyup.enter="sendItems()"
             type="text"
             placeholder="Enter word"
-            v-model="items[index]"
+            v-model="gameboardData[index]"
           />
-          {{items[index]}}
         </div>
       </div>
       <!-- make the conversation boxes for player 'challenges' -->
@@ -28,40 +28,15 @@ var socket = io.connect("http://127.0.0.1:5000");
 export default {
   name: "GameBoard",
   props: {
-    title: String
+    title: String,
+    gameData: Object,
   },
   data() {
     return {
       isConnected: false,
       submittedItem: "",
       currentItem: "",
-      items: [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
+      gameboardData: [],
       submittedIndex: 0,
       officialGameTopic: ""
     };
@@ -74,14 +49,17 @@ export default {
       axios.post();
     },
     sendItems() {
-      socket.emit("gameboard", this.items);
+      socket.emit("gameboard", this.gameboardData);
+    },
+    changeGameboardToArray() {
+      this.gameboardData = this.gameData.board.replace('[', '').replace(']', '').split(',')
     }
   },
   mounted() {
-    socket.on("message", message => {
-      this.items = message;
-      this.submittedItem = message;
+    socket.on("gameboard", message => {
+      this.gameboardData = message;
     });
+    this.changeGameboardToArray()
   }
 };
 </script>
