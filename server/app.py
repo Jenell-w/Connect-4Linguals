@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, session
+from flask import Flask, render_template, jsonify, session, request
 import requests
 from topicsAPI import topics_api
 from authAPI import auth_api
@@ -32,28 +32,31 @@ def add_header(req):
     req.headers["Cache-Control"] = "no-cache"
     return req
 
+
+
 #helper functions
 def find_game(username):
-    username_values = ["Player1_username","Player2_username"]
-    game_id = ''
+    usernamesession = session['user']
+    username_values = ["Player2_username", "Player1_username"]
+    game_id = 'nogame'
     for name in username_values:
         payload = {
             "operation":"search_by_value",
             "schema":"ConnectLinguals",
             "table":"games",
             "search_attribute":name,
-            "search_value":"{}".format(username),
+            "search_value":"{}".format(usernamesession),
             "get_attributes": ["*"]
         } 
-        try: 
+        if requests.request("POST", url, headers=headers, data=json.dumps(payload)).json() != []:
             game_id = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]['id']
-        except:
-            print('no value found')
     return game_id
 
 def update_board(board):
     usernamesession = session['user']
     game = find_game(usernamesession)
+    boardtostring = '[ '+ ', '.join(board)+ ' ]'
+    print(boardtostring)
     payload = {
             "operation":"update",
             "schema":"ConnectLinguals",
@@ -61,35 +64,34 @@ def update_board(board):
             "records": [
                 {
                     "id": "{}".format(game),
-                    "board": "{}".format(board)
+                    "board": "{}".format(boardtostring)
                 },
             ]
         }
-    try: 
-        response = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]['board']
-    except:
-        print('no value found')
+    response = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()
     return response
 
 
-@socketio.on('message')
-def handle_message(message):
-    send(message, broadcast=True)
+# @socketio.on('message')
+# def handle_message(message):
+#     send(message, broadcast=True)
 
 @socketio.on('gameboard')
 def handle_item1(message):
     usernamesession = session['user']
     room = find_game(usernamesession)
-    update_board = update_board(message)
-    send(update_board, room=room)
-    print('Item SENT__________________', message, usernamesession, room)
+    updated_board = update_board(message)
+    emit('gameboard',message, room=room)
 
 @socketio.on('join')
-def on_join():
+def on_join(player2):
     usernamesession = session['user']
     room = find_game(usernamesession)
     join_room(room)
-    send(usernamesession + ' has entered the room.', room=room)
+    send(usernamesession, room=room)
+    send(player2, room=room)
+    print('_________________________'+ player2 + ' has entered the room.  '+ room)
+    print('_________________________'+ usernamesession + ' has entered the room.  '+ room)
 
 #write the front end function to send data 
 #to the join endpoint once a successful call

@@ -37,7 +37,10 @@
         <button class="playnow" @click="playNow" type="button">Play Now!</button>
       </div>
     </div>
-    <GameBoard v-if="showBoard" />
+    <GameBoard 
+      v-if="showBoard" 
+      :gameData="gameData"
+    />
   </div>
 </template>
 
@@ -50,7 +53,7 @@ var socket = io.connect("http://127.0.0.1:5000");
 export default {
   name: "StartGame",
   props: {
-    title1: String
+    title1: String,
   },
   components: {
     GameBoard
@@ -66,7 +69,8 @@ export default {
       showBoard: false,
       showStartGameInfo: true,
       modalText: "",
-      Directions: "Directions for Game Play"
+      Directions: "Directions for Game Play",
+      gameData: null,
     };
   },
   methods: {
@@ -126,9 +130,10 @@ export default {
       axios.post("/startgame", {
         player: this.player,
         officialGameTopic: this.officialGameTopic
-      });
-      this.showBoard = true;
-      this.showStartGameInfo = false;
+      }).then(() => {
+        this.joinRoom()
+        this.checkIfGame()
+      })
     },
     openModal() {
       let modal = this.$refs.modal;
@@ -145,12 +150,28 @@ export default {
       modal.classList.remove("fade-out");
     },
 
-    sendItems() {
-      socket.emit("item1", this.items);
-    }
+    joinRoom() {
+      socket.emit("join", this.player);
+    },
+    checkIfGame() {
+      axios.get("/checkifingame")
+      .then(resp => {
+        console.log(resp.data.success)
+        console.log(resp.data.success.game === "nogame")
+        if (resp.data.success.game === "nogame") {
+          this.showBoard = false;
+          this.showStartGameInfo = true;
+        } else {
+          this.showBoard = true;
+          this.showStartGameInfo = false;
+          this.gameData = resp.data.success
+        }
+      })
+    },
   },
   mounted() {
     this.getPlayerList();
+    this.checkIfGame();
   },
   watch: {
     player() {

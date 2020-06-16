@@ -8,6 +8,7 @@ gameplay_api = Blueprint('gameplay_api', __name__)
 
 @gameplay_api.route('/userlist', methods=['GET', 'POST'])
 def get_all_users():
+    currentuser = session['user']
     payload = {
         "operation": "search_by_value",
         "schema": "ConnectLinguals",
@@ -18,7 +19,8 @@ def get_all_users():
     }
     username_list = requests.request(
         "POST", url, headers=headers, data=json.dumps(payload)).json()
-    return jsonify(username_list)
+    cleaned_username_list = res = [i for i in username_list if not (i['username'] == currentuser)] 
+    return jsonify(cleaned_username_list)
 
 
 @gameplay_api.route('/currentplayerlist', methods=['GET', 'POST'])
@@ -62,4 +64,23 @@ def get_gameboard_started():
     response = requests.request(
         "POST", url, headers=headers, data=json.dumps(payload))
     return jsonify(success=True)
+
+
+@gameplay_api.route('/checkifingame', methods=['POST', 'GET'])
+def checkifgame():
+    usernamesession = session['user']
+    username_values = ["Player2_username", "Player1_username"]
+    game_id = {'game':'nogame'}
+    for name in username_values:
+        payload = {
+            "operation":"search_by_value",
+            "schema":"ConnectLinguals",
+            "table":"games",
+            "search_attribute":name,
+            "search_value":"{}".format(usernamesession),
+            "get_attributes": ["*"]
+        } 
+        if requests.request("POST", url, headers=headers, data=json.dumps(payload)).json() != []:
+            game_id = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]
+    return jsonify(success = game_id)
 
