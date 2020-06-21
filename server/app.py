@@ -80,6 +80,7 @@ def update_board(board):
 def handle_item1(message):
     usernamesession = session['user']
     room = find_game(usernamesession)
+    print(room)
     updated_board = update_board(message)
     emit('gameboard',message, room=room)
 
@@ -87,6 +88,7 @@ def handle_item1(message):
 def on_join(player2):
     usernamesession = session['user']
     room = find_game(usernamesession)
+    print(room)
     join_room(room)
     send(usernamesession, room=room)
     send(player2, room=room)
