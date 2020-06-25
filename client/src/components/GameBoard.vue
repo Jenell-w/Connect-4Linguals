@@ -1,9 +1,14 @@
 <template>
   <div class="hello">
-    <h1>Topic: {{gameData.official_game_topic}}</h1>
-    <br />
-    <h3>Player1: {{gameData.Player1_username}}</h3>
-    <h3>Player2: {{gameData.Player2_username}}</h3>
+    <div class="game-data">
+      <h1>Topic: {{gameData.official_game_topic}}</h1>
+      <br />
+      <br />
+      <h3>Player1: {{gameData.Player1_username}}</h3>
+      <br />
+      <br />
+      <h3>Player2: {{gameData.Player2_username}}</h3>
+    </div>
     <div class="game-board">
       <div v-for="(item, index) in gameboardData" :key="index">
         <div class="grid-item">
@@ -106,10 +111,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.play-now-topic {
-  display: flex;
+.game-data {
+  align-content: center;
   justify-content: center;
-  align-items: center;
+  padding: 10px 10px;
 }
 .game-board {
   display: grid;

@@ -5,7 +5,7 @@
       <div class="modal-content" ref="modalContent">
         <div class="modal-body">
           <span @click="$refs.modal.style.display='none'" class="close">&times;</span>
-          <button class="button" @click="getDirections">How Do I Play?{{this.modalText}}</button>
+          <button class="directions-button" @click="getDirections">How Do I Play?{{this.modalText}}</button>
         </div>
       </div>
     </div>
@@ -174,4 +174,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+#directions {
+  text-align: center;
+  justify-content: center;
+}
+</style>
