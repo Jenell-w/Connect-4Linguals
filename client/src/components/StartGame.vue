@@ -165,20 +165,12 @@ export default {
           this.gameData = resp.data.success
           socket.emit('join', this.userSessionID);
         }
-      })
-    },
+      });
+    }
   },
   mounted() {
     this.getPlayerList();
     this.checkIfGame();
-  },
-  watch: {
-    player() {
-      console.log("my watcher", this.player);
-    },
-    topic() {
-      console.log("my topic", this.officialGameTopic);
-    }
   }
 };
 </script>
