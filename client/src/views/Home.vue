@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <StartGame title1="Let's Start a Game" />
+    <StartGame 
+      title1="Let's Start a Game" 
+      :userSessionID='userSessionID'
+    />
   </div>
 </template>
 
@@ -16,7 +19,8 @@ export default {
   data() {
     return {
       message: "",
-      messageList: []
+      messageList: [],
+      userSessionID: '',
     };
   },
   mounted() {

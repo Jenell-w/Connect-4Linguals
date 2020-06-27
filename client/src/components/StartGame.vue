@@ -40,6 +40,8 @@
     <GameBoard 
       v-if="showBoard" 
       :gameData="gameData"
+      :room="room"
+      :userSessionID='userSessionID'
     />
   </div>
 </template>
@@ -54,6 +56,7 @@ export default {
   name: "StartGame",
   props: {
     title1: String,
+    userSessionID: String,
   },
   components: {
     GameBoard
@@ -71,6 +74,7 @@ export default {
       modalText: "",
       Directions: "Directions for Game Play",
       gameData: null,
+      room: null,
     };
   },
   methods: {
@@ -131,7 +135,6 @@ export default {
         player: this.player,
         officialGameTopic: this.officialGameTopic
       }).then(() => {
-        this.joinRoom()
         this.checkIfGame()
       })
     },
@@ -150,14 +153,9 @@ export default {
       modal.classList.remove("fade-out");
     },
 
-    joinRoom() {
-      socket.emit("join", this.player);
-    },
     checkIfGame() {
       axios.get("/checkifingame")
       .then(resp => {
-        console.log(resp.data.success)
-        console.log(resp.data.success.game === "nogame")
         if (resp.data.success.game === "nogame") {
           this.showBoard = false;
           this.showStartGameInfo = true;
@@ -165,6 +163,7 @@ export default {
           this.showBoard = true;
           this.showStartGameInfo = false;
           this.gameData = resp.data.success
+          socket.emit('join', this.userSessionID);
         }
       })
     },
