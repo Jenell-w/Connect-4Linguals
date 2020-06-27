@@ -4,6 +4,7 @@
     <br />
     <h3>Player1: {{gameData.Player1_username}}</h3>
     <h3>Player2: {{gameData.Player2_username}}</h3>
+
     <div class="game-board">
       <div v-for="(item, index) in gameboardData" :key="index">
         <div class="grid-item">
@@ -58,7 +59,8 @@ export default {
   name: "GameBoard",
   props: {
     title: String,
-    gameData: Object
+    gameData: Object,
+    userSessionID: String,
   },
   data() {
     return {
@@ -75,7 +77,8 @@ export default {
       currentItem: "",
       gameboardData: [],
       submittedIndex: 0,
-      officialGameTopic: ""
+      officialGameTopic: "",
+      room: null,
     };
   },
   methods: {
@@ -86,20 +89,31 @@ export default {
       });
     },
     sendItems() {
-      socket.emit("gameboard", this.gameboardData);
+      socket.emit("gameboard", this.gameboardData, this.userSessionID);
     },
     changeGameboardToArray() {
-      this.gameboardData = this.gameData.board
-        .replace("[", "")
-        .replace("]", "")
-        .split(",");
-    }
+      this.gameboardData = this.gameData.board.replace('[', '').replace(']', '').split(',')
+    },
+    checkIfGame() {
+      axios.get("/checkifingame")
+      .then(resp => {
+        this.room = resp.data.success['id']
+        socket.emit("join", this.userSessionID)
+      })
+    },
   },
   mounted() {
+    // socket.emit("join")
     socket.on("gameboard", message => {
       this.gameboardData = message;
     });
-    this.changeGameboardToArray();
+    socket.on('join_room', function(msg) {
+      console.log(msg)
+      console.log(msg['room']);
+      this.room = msg['room']
+    });
+    this.changeGameboardToArray()
+    this.checkIfGame()
   }
 };
 </script>
