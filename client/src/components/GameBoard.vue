@@ -1,10 +1,14 @@
 <template>
   <div class="hello">
-    <h1>Topic: {{gameData.official_game_topic}}</h1>
-    <br />
-    <h3>Player1: {{gameData.Player1_username}}</h3>
-    <h3>Player2: {{gameData.Player2_username}}</h3>
-
+    <div class="game-data">
+      <h1>Topic: {{gameData.official_game_topic}}</h1>
+      <br />
+      <br />
+      <h3>Player1: {{gameData.Player1_username}}</h3>
+      <br />
+      <br />
+      <h3>Player2: {{gameData.Player2_username}}</h3>
+    </div>
     <div class="game-board">
       <div v-for="(item, index) in gameboardData" :key="index">
         <div class="grid-item">
@@ -60,7 +64,7 @@ export default {
   props: {
     title: String,
     gameData: Object,
-    userSessionID: String,
+    userSessionID: String
   },
   data() {
     return {
@@ -78,7 +82,7 @@ export default {
       gameboardData: [],
       submittedIndex: 0,
       officialGameTopic: "",
-      room: null,
+      room: null
     };
   },
   methods: {
@@ -92,38 +96,40 @@ export default {
       socket.emit("gameboard", this.gameboardData, this.userSessionID);
     },
     changeGameboardToArray() {
-      this.gameboardData = this.gameData.board.replace('[', '').replace(']', '').split(',')
+      this.gameboardData = this.gameData.board
+        .replace("[", "")
+        .replace("]", "")
+        .split(",");
     },
     checkIfGame() {
-      axios.get("/checkifingame")
-      .then(resp => {
-        this.room = resp.data.success['id']
-        socket.emit("join", this.userSessionID)
-      })
-    },
+      axios.get("/checkifingame").then(resp => {
+        this.room = resp.data.success["id"];
+        socket.emit("join", this.userSessionID);
+      });
+    }
   },
   mounted() {
     // socket.emit("join")
     socket.on("gameboard", message => {
       this.gameboardData = message;
     });
-    socket.on('join_room', function(msg) {
-      console.log(msg)
-      console.log(msg['room']);
-      this.room = msg['room']
+    socket.on("join_room", function(msg) {
+      console.log(msg);
+      console.log(msg["room"]);
+      this.room = msg["room"];
     });
-    this.changeGameboardToArray()
-    this.checkIfGame()
+    this.changeGameboardToArray();
+    this.checkIfGame();
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.play-now-topic {
-  display: flex;
+.game-data {
+  align-content: center;
   justify-content: center;
-  align-items: center;
+  padding: 10px 10px;
 }
 .game-board {
   display: grid;
