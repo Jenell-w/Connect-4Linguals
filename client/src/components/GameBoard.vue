@@ -104,6 +104,7 @@ export default {
     checkIfGame() {
       axios.get("/checkifingame").then(resp => {
         this.room = resp.data.success["id"];
+        console.log(this.room);
         socket.emit("join", this.userSessionID);
       });
     }
