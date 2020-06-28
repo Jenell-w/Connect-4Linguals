@@ -63,7 +63,8 @@ export default {
   name: "GameBoard",
   props: {
     title: String,
-    gameData: Object
+    gameData: Object,
+    userSessionID: String
   },
   data() {
     return {
@@ -80,7 +81,8 @@ export default {
       currentItem: "",
       gameboardData: [],
       submittedIndex: 0,
-      officialGameTopic: ""
+      officialGameTopic: "",
+      room: null
     };
   },
   methods: {
@@ -91,20 +93,33 @@ export default {
       });
     },
     sendItems() {
-      socket.emit("gameboard", this.gameboardData);
+      socket.emit("gameboard", this.gameboardData, this.userSessionID);
     },
     changeGameboardToArray() {
       this.gameboardData = this.gameData.board
         .replace("[", "")
         .replace("]", "")
         .split(",");
+    },
+    checkIfGame() {
+      axios.get("/checkifingame").then(resp => {
+        this.room = resp.data.success["id"];
+        socket.emit("join", this.userSessionID);
+      });
     }
   },
   mounted() {
+    // socket.emit("join")
     socket.on("gameboard", message => {
       this.gameboardData = message;
     });
+    socket.on("join_room", function(msg) {
+      console.log(msg);
+      console.log(msg["room"]);
+      this.room = msg["room"];
+    });
     this.changeGameboardToArray();
+    this.checkIfGame();
   }
 };
 </script>

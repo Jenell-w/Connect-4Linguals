@@ -34,30 +34,56 @@ def add_header(req):
     return req
 
 
-# @socketio.on('message')
-# def handle_message(message):
-#     send(message, broadcast=True)
+
+#helper functions
+def find_game(username):
+    usernamesession = username
+    username_values = ["Player2_username", "Player1_username"]
+    game_id = 'nogame'
+    for name in username_values:
+        payload = {
+            "operation":"search_by_value",
+            "schema":"ConnectLinguals",
+            "table":"games",
+            "search_attribute":name,
+            "search_value":"{}".format(usernamesession),
+            "get_attributes": ["*"]
+        } 
+        if requests.request("POST", url, headers=headers, data=json.dumps(payload)).json() != []:
+            game_id = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]['id']
+    return game_id
+
+def update_board(board):
+    usernamesession = session['user']
+    game = find_game(usernamesession)
+    boardtostring = '[ '+ ', '.join(board)+ ' ]'
+    payload = {
+            "operation":"update",
+            "schema":"ConnectLinguals",
+            "table":"games",
+            "records": [
+                {
+                    "id": "{}".format(game),
+                    "board": "{}".format(boardtostring)
+                },
+            ]
+        }
+    response = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()
+    return response
 
 @socketio.on('gameboard')
-def handle_item1(message):
-    usernamesession = session['user']
-    room = find_game(usernamesession)
+def handle_item1(message, player):
+    usernamesession = player
     updated_board = update_board(message)
+    room = find_game(usernamesession)
     emit('gameboard',message, room=room)
 
 @socketio.on('join')
-def on_join(player2):
-    usernamesession = session['user']
+def join(player):
+    usernamesession = player
     room = find_game(usernamesession)
     join_room(room)
-    send(usernamesession, room=room)
-    send(player2, room=room)
-    print('_________________________'+ player2 + ' has entered the room.  '+ room)
-    print('_________________________'+ usernamesession + ' has entered the room.  '+ room)
-
-#write the front end function to send data 
-#to the join endpoint once a successful call
-#is made to the db to create the game
+    emit('join_room', {'room': room, 'player': usernamesession})
 
 
 if __name__ == "__main__":

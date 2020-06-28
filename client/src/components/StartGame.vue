@@ -37,7 +37,12 @@
         <button class="playnow" @click="playNow" type="button">Play Now!</button>
       </div>
     </div>
-    <GameBoard v-if="showBoard" :gameData="gameData" />
+    <GameBoard 
+      v-if="showBoard" 
+      :gameData="gameData"
+      :room="room"
+      :userSessionID='userSessionID'
+    />
   </div>
 </template>
 
@@ -50,7 +55,8 @@ var socket = io.connect("http://127.0.0.1:5000");
 export default {
   name: "StartGame",
   props: {
-    title1: String
+    title1: String,
+    userSessionID: String,
   },
   components: {
     GameBoard
@@ -67,7 +73,8 @@ export default {
       showStartGameInfo: true,
       modalText: "",
       Directions: "Directions for Game Play",
-      gameData: null
+      gameData: null,
+      room: null,
     };
   },
   methods: {
@@ -124,15 +131,12 @@ export default {
     playNow() {
       this.officialGameTopic = this.userTopic + this.RandomTopic;
       console.log("playnow official game topic,", this.officialGameTopic);
-      axios
-        .post("/startgame", {
-          player: this.player,
-          officialGameTopic: this.officialGameTopic
-        })
-        .then(() => {
-          this.joinRoom();
-          this.checkIfGame();
-        });
+      axios.post("/startgame", {
+        player: this.player,
+        officialGameTopic: this.officialGameTopic
+      }).then(() => {
+        this.checkIfGame()
+      })
     },
     openModal() {
       let modal = this.$refs.modal;
@@ -149,20 +153,17 @@ export default {
       modal.classList.remove("fade-out");
     },
 
-    joinRoom() {
-      socket.emit("join", this.player);
-    },
     checkIfGame() {
-      axios.get("/checkifingame").then(resp => {
-        console.log(resp.data.success);
-        console.log(resp.data.success.game === "nogame");
+      axios.get("/checkifingame")
+      .then(resp => {
         if (resp.data.success.game === "nogame") {
           this.showBoard = false;
           this.showStartGameInfo = true;
         } else {
           this.showBoard = true;
           this.showStartGameInfo = false;
-          this.gameData = resp.data.success;
+          this.gameData = resp.data.success
+          socket.emit('join', this.userSessionID);
         }
       });
     }
