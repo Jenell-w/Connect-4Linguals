@@ -37,12 +37,7 @@
         <button class="playnow" @click="playNow" type="button">Play Now!</button>
       </div>
     </div>
-    <GameBoard 
-      v-if="showBoard" 
-      :gameData="gameData"
-      :room="room"
-      :userSessionID='userSessionID'
-    />
+    <GameBoard v-if="showBoard" :gameData="gameData" :room="room" :userSessionID="userSessionID" />
   </div>
 </template>
 
@@ -56,7 +51,7 @@ export default {
   name: "StartGame",
   props: {
     title1: String,
-    userSessionID: String,
+    userSessionID: String
   },
   components: {
     GameBoard
@@ -74,7 +69,7 @@ export default {
       modalText: "",
       Directions: "Directions for Game Play",
       gameData: null,
-      room: null,
+      room: null
     };
   },
   methods: {
@@ -130,13 +125,14 @@ export default {
     },
     playNow() {
       this.officialGameTopic = this.userTopic + this.RandomTopic;
-      console.log("playnow official game topic,", this.officialGameTopic);
-      axios.post("/startgame", {
-        player: this.player,
-        officialGameTopic: this.officialGameTopic
-      }).then(() => {
-        this.checkIfGame()
-      })
+      axios
+        .post("/startgame", {
+          player: this.player,
+          officialGameTopic: this.officialGameTopic
+        })
+        .then(() => {
+          this.checkIfGame();
+        });
     },
     openModal() {
       let modal = this.$refs.modal;
@@ -154,16 +150,15 @@ export default {
     },
 
     checkIfGame() {
-      axios.get("/checkifingame")
-      .then(resp => {
+      axios.post("/checkifingame").then(resp => {
         if (resp.data.success.game === "nogame") {
           this.showBoard = false;
           this.showStartGameInfo = true;
         } else {
           this.showBoard = true;
           this.showStartGameInfo = false;
-          this.gameData = resp.data.success
-          socket.emit('join', this.userSessionID);
+          this.gameData = resp.data.success;
+          socket.emit("join", this.userSessionID);
         }
       });
     }

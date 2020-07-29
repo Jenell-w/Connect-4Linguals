@@ -65,7 +65,10 @@ def get_gameboard_started():
 
 @gameplay_api.route('/checkifingame', methods=['POST', 'GET'])
 def checkifgame():
-    usernamesession = session['user']
+    usernamesession = session.get('user')
+    #session['user'] = session.get('user')
+    #usernamesession = session['user']
+    print('USERNAME SESSION---------->', usernamesession)
     username_values = ["Player2_username", "Player1_username"]
     game_id = {'game':'nogame'}
     for name in username_values:
@@ -79,6 +82,7 @@ def checkifgame():
         } 
         if requests.request("POST", url, headers=headers, data=json.dumps(payload)).json() != []:
             game_id = requests.request("POST", url, headers=headers, data=json.dumps(payload)).json()[0]
+            print("GAMEID IS----------", game_id)
     return jsonify(success = game_id)
 
 @gameplay_api.route('/userchallenge', methods=['POST', 'GET'])

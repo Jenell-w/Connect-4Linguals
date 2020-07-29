@@ -33,8 +33,6 @@ def add_header(req):
     req.headers["Cache-Control"] = "no-cache"
     return req
 
-
-
 #helper functions
 def find_game(username):
     usernamesession = username

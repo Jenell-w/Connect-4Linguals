@@ -1,7 +1,7 @@
 <template>
   <div class="routers">
     <nav id="home-login-register-logout">
-      <router-link tag="button" class="button" to="/">Home</router-link>
+      <router-link tag="button" class="button" v-if="this.checksession = false" to="/">Home</router-link>
       <br />
       <br />
       <router-link tag="button" class="button" v-if="!checksession" to="/login">Login</router-link>

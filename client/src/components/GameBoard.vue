@@ -102,7 +102,7 @@ export default {
         .split(",");
     },
     checkIfGame() {
-      axios.get("/checkifingame").then(resp => {
+      axios.post("/checkifingame").then(resp => {
         this.room = resp.data.success["id"];
         console.log(this.room);
         socket.emit("join", this.userSessionID);
@@ -110,7 +110,6 @@ export default {
     }
   },
   mounted() {
-    // socket.emit("join")
     socket.on("gameboard", message => {
       this.gameboardData = message;
     });
